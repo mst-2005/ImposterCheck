@@ -69,7 +69,7 @@ def draw_synthetic_face(w=120, h=140, is_alternate=False):
 # -------------------------------------------------------------
 # 2. IMAGE GENERATORS: GENUINE, TAMPERED & MULTI-CARD
 # -------------------------------------------------------------
-def make_id_card(name="ALEX MERCER", doc_id="DL-8892140A", title="FEDERAL DRIVER LICENSE", is_tampered=False, face_alternate=False):
+def make_id_card(name="MAHITA", doc_id="DL-8892140A", title="FEDERAL DRIVER LICENSE", is_tampered=False, face_alternate=False):
     # Standard ID card ratio ~ 1.58 (600x380)
     w, h = 600, 380
     card = np.full((h, w, 3), (245, 248, 250), dtype=np.uint8)
@@ -115,11 +115,11 @@ def make_id_card(name="ALEX MERCER", doc_id="DL-8892140A", title="FEDERAL DRIVER
     return card
 
 # 1. Genuine ID Photo
-img_genuine = make_id_card("ALEX MERCER", "DL-8892140A", "STATE OF CALIFORNIA DRIVER LICENSE", is_tampered=False)
+img_genuine = make_id_card("MAHITA", "DL-8892140A", "STATE OF CALIFORNIA DRIVER LICENSE", is_tampered=False)
 cv2.imwrite(str(OUT_DIR / "1_genuine_id_card.png"), img_genuine)
 
 # 2. Forged Tampered ID
-img_tampered = make_id_card("ALEX MERCER", "DL-8892140A", "STATE OF CALIFORNIA DRIVER LICENSE", is_tampered=True)
+img_tampered = make_id_card("MAHITA", "DL-8892140A", "STATE OF CALIFORNIA DRIVER LICENSE", is_tampered=True)
 cv2.imwrite(str(OUT_DIR / "2_forged_tampered_id.png"), img_tampered)
 
 # 3. Multi-Card Single File (Passport + Driver License in 1 image)
@@ -131,12 +131,12 @@ grid[:, ::40, :] = (60, 65, 70)
 multi_canvas = cv2.addWeighted(multi_canvas, 0.8, grid, 0.2, 0)
 
 # Place Card #1 (Passport Card on top)
-c1 = make_id_card("ALEX MERCER", "USA-PASS-449102", "UNITED STATES PASSPORT CARD", face_alternate=False)
+c1 = make_id_card("MAHITA", "USA-PASS-449102", "UNITED STATES PASSPORT CARD", face_alternate=False)
 c1_scaled = cv2.resize(c1, (440, 280))
 multi_canvas[60:340, 60:500] = c1_scaled
 
 # Place Card #2 (Driver License on bottom right)
-c2 = make_id_card("ALEX MERCER", "DL-8892140A", "NATIONAL IDENTIFICATION CARD", face_alternate=False)
+c2 = make_id_card("MAHITA", "DL-8892140A", "NATIONAL IDENTIFICATION CARD", face_alternate=False)
 c2_scaled = cv2.resize(c2, (440, 280))
 multi_canvas[400:680, 460:900] = c2_scaled
 
@@ -153,7 +153,7 @@ try:
     # Page 1: Identity Profile
     page1 = pdf_doc.new_page(width=595, height=842) # A4
     page1.insert_text((50, 60), "OFFICIAL IDENTITY VERIFICATION DOSSIER", fontsize=16, color=(0.1, 0.2, 0.4))
-    page1.insert_text((50, 90), "Subject: ALEX MERCER  |  Verification Status: KYC CLEARED", fontsize=11, color=(0.2, 0.5, 0.2))
+    page1.insert_text((50, 90), "Subject: MAHITA  |  Verification Status: KYC CLEARED", fontsize=11, color=(0.2, 0.5, 0.2))
     page1.insert_text((50, 120), "Date of Birth: 1994-05-12   |   Nationality: USA   |   Document Ref: DL-8892140A", fontsize=10)
     page1.insert_text((50, 145), "Biometric verification performed across facial scans and optical character recognition.", fontsize=10)
     
@@ -165,7 +165,7 @@ try:
     # Page 2: Secondary Proof of Address
     page2 = pdf_doc.new_page(width=595, height=842)
     page2.insert_text((50, 60), "UTILITY BILL & RESIDENTIAL CONFIRMATION", fontsize=14, color=(0.1, 0.2, 0.4))
-    page2.insert_text((50, 100), "Resident Name: ALEX MERCER\nAddress: 742 Evergreen Terrace, Springfield, OR 97477\nBilling Period: August 2026\nAccount Number: UTIL-992140-A\nStatus: Paid in Full", fontsize=11)
+    page2.insert_text((50, 100), "Resident Name: MAHITA\nAddress: 742 Evergreen Terrace, Springfield, OR 97477\nBilling Period: August 2026\nAccount Number: UTIL-992140-A\nStatus: Paid in Full", fontsize=11)
     
     pdf_path = OUT_DIR / "4_identity_dossier.pdf"
     pdf_doc.save(str(pdf_path))
@@ -186,7 +186,7 @@ try:
     
     p = doc.add_paragraph()
     p.add_run("Verified Employee: ").bold = True
-    p.add_run("Alex Mercer\n")
+    p.add_run("Mahita\n")
     p.add_run("Department: ").bold = True
     p.add_run("Cybersecurity Threat Intelligence\n")
     p.add_run("Employee ID: ").bold = True
@@ -313,12 +313,13 @@ generate_test_video("10_slowmo_test_video.mp4", mode="slowmo", fps=60.0, n_frame
 # -------------------------------------------------------------
 # 7. MULTI-FILE CROSS-IDENTITY COMPARISON TEST SETS
 # -------------------------------------------------------------
-# Matching Set: Alex Mercer ID + Alex Mercer Selfie
+# Matching Set: Mahita ID + Mahita Selfie
 selfie_match = np.full((500, 500, 3), (30, 35, 45), dtype=np.uint8)
 face_match = draw_synthetic_face(260, 320, is_alternate=False)
 selfie_match[90:410, 120:380] = face_match
-cv2.putText(selfie_match, "SELFIE: ALEX MERCER (GENUINE MATCH)", (30, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (16, 185, 129), 2)
-cv2.imwrite(str(OUT_DIR / "11_match_alex_mercer_selfie.png"), selfie_match)
+cv2.putText(selfie_match, "SELFIE: MAHITA (GENUINE MATCH)", (30, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (16, 185, 129), 2)
+cv2.imwrite(str(OUT_DIR / "11_match_mahita_selfie.png"), selfie_match)
+
 
 # Imposter / Fake Set: Imposter Selfie with completely DIFFERENT Face
 selfie_imposter = np.full((500, 500, 3), (30, 35, 45), dtype=np.uint8)

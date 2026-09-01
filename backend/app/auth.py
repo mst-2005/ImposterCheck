@@ -57,21 +57,22 @@ def _verify_token(token: str) -> Optional[Dict[str, str]]:
 # Seed initial demo user if users.json is empty
 def _ensure_initial_users():
     users = _load_json(USERS_FILE, {})
-    if not users:
-        demo_id = "user_demo_001"
-        users[demo_id] = {
-            "id": demo_id,
-            "name": "Alex Mercer",
-            "email": "alex.mercer@impostercheck.ai",
-            "password_hash": _hash_password("password123"),
-            "role": "Lead Identity Forensic Specialist",
-            "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Alex",
-            "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "provider": "local"
-        }
-        _save_json(USERS_FILE, users)
+    demo_id = "user_demo_001"
+    # Ensure Mahita is always present as the primary demo user
+    users[demo_id] = {
+        "id": demo_id,
+        "name": "Mahita",
+        "email": "mahita@impostercheck.ai",
+        "password_hash": _hash_password("password123"),
+        "role": "Lead Identity Specialist",
+        "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Mahita",
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "provider": "local"
+    }
+    _save_json(USERS_FILE, users)
 
 _ensure_initial_users()
+
 
 def signup_user(name: str, email: str, password: str, role: str = "Forensic Analyst") -> Dict[str, Any]:
     users = _load_json(USERS_FILE, {})

@@ -191,7 +191,7 @@ def list_sample_files():
         "8_liveness_selfie_video.mp4": {"title": "Liveness Selfie Video (Video)", "category": "Video", "expected": "PASS", "desc": "Live motion video with nodding and blinking subject."},
         "9_timelapse_test_video.mp4": {"title": "Accelerated Timelapse (Video)", "category": "Video", "expected": "REVIEW", "desc": "High-velocity accelerated motion video test clip."},
         "10_slowmo_test_video.mp4": {"title": "Slow-Motion 60 FPS (Video)", "category": "Video", "expected": "PASS", "desc": "High framerate slow-motion video with subtle movements."},
-        "11_match_alex_mercer_selfie.png": {"title": "Matching Face Selfie (Photo)", "category": "Comparison Set", "expected": "MATCH", "desc": "Selfie matching Alex Mercer ID (use in Multi-File Compare)."},
+        "11_match_mahita_selfie.png": {"title": "Matching Face Selfie (Photo)", "category": "Comparison Set", "expected": "MATCH", "desc": "Selfie matching Mahita ID (use in Multi-File Compare)."},
         "12_imposter_mismatch_selfie.png": {"title": "Imposter Different Face (Photo)", "category": "Comparison Set", "expected": "IMPOSTER", "desc": "Different subject selfie (use in Multi-File Compare to test mismatch)."}
     }
     for p in files:
