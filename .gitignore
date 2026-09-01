@@ -12,3 +12,5 @@ models/*.joblib
 *.DS_Store
 .pytest_cache/
 data/*.json
+.server.pid
+.server.log
