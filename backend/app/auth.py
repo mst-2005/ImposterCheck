@@ -62,7 +62,7 @@ def _ensure_initial_users():
     users[demo_id] = {
         "id": demo_id,
         "name": "Mahita",
-        "email": "mahita@impostercheck.ai",
+        "email": "mahita.thundiyil.btech2024@sitpune.edu.in",
         "password_hash": _hash_password("password123"),
         "role": "Lead Identity Specialist",
         "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Mahita",

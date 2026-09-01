@@ -591,7 +591,7 @@ async function handleSocialPopupSubmit(e) {
 }
 
 function handleQuickDemoLogin() {
-  elements.loginEmail.value = "mahita@impostercheck.ai";
+  elements.loginEmail.value = "mahita.thundiyil.btech2024@sitpune.edu.in";
   elements.loginPassword.value = "password123";
   elements.formLogin.dispatchEvent(new Event("submit"));
 }
