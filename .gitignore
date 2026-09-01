@@ -11,3 +11,4 @@ models/*.joblib
 .DS_Store
 *.DS_Store
 .pytest_cache/
+data/*.json
