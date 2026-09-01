@@ -44,6 +44,271 @@
   --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================================================
+   THEME DEFINITIONS & CUSTOM COLOR PALETTES
+   ========================================================================== */
+
+/* 1. Hacker Matrix (Phosphor Green & Terminal Dark) */
+[data-theme="matrix"] {
+  --bg-base: #020803;
+  --bg-surface: #07150a;
+  --bg-surface-elevated: #0e2714;
+  --bg-card: rgba(7, 24, 11, 0.88);
+  --bg-card-hover: rgba(12, 38, 18, 0.92);
+  --border-color: rgba(0, 255, 102, 0.15);
+  --border-glow: rgba(0, 255, 102, 0.35);
+  --text-primary: #ecfdf5;
+  --text-secondary: #6ee7b7;
+  --text-muted: #059669;
+  --cyan-primary: #00ff66;
+  --cyan-glow: rgba(0, 255, 102, 0.45);
+  --blue-primary: #10b981;
+  --purple-primary: #84cc16;
+  --purple-glow: rgba(132, 204, 22, 0.35);
+}
+
+/* 2. Federal Intel (Navy & Cobalt) */
+[data-theme="federal-navy"] {
+  --bg-base: #030712;
+  --bg-surface: #09132b;
+  --bg-surface-elevated: #102046;
+  --bg-card: rgba(11, 22, 48, 0.85);
+  --bg-card-hover: rgba(18, 35, 75, 0.9);
+  --border-color: rgba(56, 189, 248, 0.14);
+  --border-glow: rgba(37, 99, 235, 0.35);
+  --text-primary: #f8fafc;
+  --text-secondary: #93c5fd;
+  --text-muted: #60a5fa;
+  --cyan-primary: #38bdf8;
+  --cyan-glow: rgba(56, 189, 248, 0.4);
+  --blue-primary: #2563eb;
+  --purple-primary: #6366f1;
+  --purple-glow: rgba(99, 102, 241, 0.35);
+}
+
+/* 3. Crimson Threat (Dark Slate & Scarlet Red) */
+[data-theme="crimson-threat"] {
+  --bg-base: #0b0306;
+  --bg-surface: #18080e;
+  --bg-surface-elevated: #280e18;
+  --bg-card: rgba(26, 9, 16, 0.88);
+  --bg-card-hover: rgba(38, 14, 24, 0.92);
+  --border-color: rgba(255, 42, 95, 0.16);
+  --border-glow: rgba(255, 42, 95, 0.4);
+  --text-primary: #fff1f2;
+  --text-secondary: #fda4af;
+  --text-muted: #f43f5e;
+  --cyan-primary: #ff2a5f;
+  --cyan-glow: rgba(255, 42, 95, 0.45);
+  --blue-primary: #fb7185;
+  --purple-primary: #f43f5e;
+  --purple-glow: rgba(244, 63, 94, 0.35);
+}
+
+/* 4. Aurora Violet (Amethyst & Neon Violet) */
+[data-theme="aurora-violet"] {
+  --bg-base: #080212;
+  --bg-surface: #120624;
+  --bg-surface-elevated: #200a3d;
+  --bg-card: rgba(21, 8, 41, 0.85);
+  --bg-card-hover: rgba(33, 14, 64, 0.9);
+  --border-color: rgba(217, 70, 239, 0.16);
+  --border-glow: rgba(217, 70, 239, 0.4);
+  --text-primary: #faf5ff;
+  --text-secondary: #e9d5ff;
+  --text-muted: #c084fc;
+  --cyan-primary: #d946ef;
+  --cyan-glow: rgba(217, 70, 239, 0.45);
+  --blue-primary: #a855f7;
+  --purple-primary: #8b5cf6;
+  --purple-glow: rgba(139, 92, 246, 0.35);
+}
+
+/* 5. Arctic Forensic Light Mode */
+[data-theme="arctic-light"] {
+  --bg-base: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-hover: rgba(248, 250, 252, 0.98);
+  --border-color: rgba(15, 23, 42, 0.12);
+  --border-glow: rgba(2, 132, 199, 0.3);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --cyan-primary: #0284c7;
+  --cyan-glow: rgba(2, 132, 199, 0.35);
+  --blue-primary: #2563eb;
+  --purple-primary: #7c3aed;
+  --purple-glow: rgba(124, 58, 237, 0.25);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="arctic-light"] .app-header {
+  background: rgba(255, 255, 255, 0.88);
+}
+[data-theme="arctic-light"] .auth-card {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+}
+[data-theme="arctic-light"] .auth-tab-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+[data-theme="arctic-light"] .btn-primary {
+  color: #ffffff;
+}
+[data-theme="arctic-light"] .loading-modal {
+  background: rgba(241, 245, 249, 0.85);
+}
+[data-theme="arctic-light"] .brand-title {
+  background: linear-gradient(90deg, #0f172a, #0284c7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-theme="arctic-light"] .system-status {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+[data-theme="arctic-light"] .status-text {
+  color: #065f46;
+}
+
+/* Ambient glow adjustments per theme */
+[data-theme="matrix"] .glow-1 { background: radial-gradient(circle, #00ff66 0%, transparent 70%); }
+[data-theme="matrix"] .glow-2 { background: radial-gradient(circle, #10b981 0%, transparent 70%); }
+[data-theme="federal-navy"] .glow-1 { background: radial-gradient(circle, #38bdf8 0%, transparent 70%); }
+[data-theme="federal-navy"] .glow-2 { background: radial-gradient(circle, #2563eb 0%, transparent 70%); }
+[data-theme="crimson-threat"] .glow-1 { background: radial-gradient(circle, #ff2a5f 0%, transparent 70%); }
+[data-theme="crimson-threat"] .glow-2 { background: radial-gradient(circle, #f43f5e 0%, transparent 70%); }
+[data-theme="aurora-violet"] .glow-1 { background: radial-gradient(circle, #d946ef 0%, transparent 70%); }
+[data-theme="aurora-violet"] .glow-2 { background: radial-gradient(circle, #a855f7 0%, transparent 70%); }
+[data-theme="arctic-light"] .glow-1 { background: radial-gradient(circle, #bae6fd 0%, transparent 70%); opacity: 0.5; }
+[data-theme="arctic-light"] .glow-2 { background: radial-gradient(circle, #ddd6fe 0%, transparent 70%); opacity: 0.5; }
+
+/* Theme Selector UI Styling */
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-dropdown-wrapper {
+  position: relative;
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 30px;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--cyan-primary);
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+.theme-icon { font-size: 0.95rem; }
+.theme-name { font-weight: 700; color: var(--cyan-primary); }
+.chevron-icon { color: var(--text-muted); transition: transform 0.2s ease; }
+.theme-dropdown-wrapper.open .chevron-icon { transform: rotate(180deg); }
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  box-shadow: var(--shadow-card), 0 0 24px var(--cyan-glow);
+  z-index: 200;
+  animation: fadeInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-menu-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.theme-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.theme-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-opt-btn:hover {
+  background: var(--bg-surface-elevated);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-opt-btn.active {
+  background: var(--bg-surface-elevated);
+  border-color: var(--cyan-primary);
+}
+
+.theme-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.swatch-cyberpunk { background: linear-gradient(135deg, #00f2fe, #4facfe); }
+.swatch-matrix { background: linear-gradient(135deg, #00ff66, #10b981); }
+.swatch-navy { background: linear-gradient(135deg, #38bdf8, #2563eb); }
+.swatch-crimson { background: linear-gradient(135deg, #ff2a5f, #f43f5e); }
+.swatch-violet { background: linear-gradient(135deg, #d946ef, #a855f7); }
+.swatch-light { background: linear-gradient(135deg, #ffffff, #0284c7); border-color: #94a3b8; }
+
+.theme-opt-info {
+  display: flex;
+  flex-direction: column;
+}
+.theme-opt-title { font-size: 0.85rem; font-weight: 700; }
+.theme-opt-desc { font-size: 0.72rem; color: var(--text-secondary); }
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

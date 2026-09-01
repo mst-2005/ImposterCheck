@@ -36,6 +36,64 @@
           <span class="status-pulse"></span>
           <span class="status-text">AI Verification Core Online</span>
         </div>
+
+        <!-- Theme Selector Menu -->
+        <div class="theme-dropdown-wrapper" id="theme-dropdown-wrapper">
+          <button type="button" class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Select Theme" title="Customize UI Theme">
+            <span class="theme-icon" id="current-theme-icon">🎨</span>
+            <span class="theme-name" id="current-theme-name">Cyberpunk</span>
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="theme-menu hidden" id="theme-menu">
+            <div class="theme-menu-header">Select Visual Theme</div>
+            <div class="theme-options-grid">
+              <button type="button" class="theme-opt-btn active" data-theme="cyberpunk">
+                <span class="theme-swatch swatch-cyberpunk"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">⚡ Cyberpunk Neon</span>
+                  <span class="theme-opt-desc">Obsidian & Electric Cyan</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="matrix">
+                <span class="theme-swatch swatch-matrix"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">💻 Hacker Matrix</span>
+                  <span class="theme-opt-desc">Phosphor Terminal Green</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="federal-navy">
+                <span class="theme-swatch swatch-navy"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🛡️ Federal Intel</span>
+                  <span class="theme-opt-desc">Deep Navy & Cobalt Blue</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="crimson-threat">
+                <span class="theme-swatch swatch-crimson"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🚨 Crimson Threat</span>
+                  <span class="theme-opt-desc">Carbon & Scarlet Warning</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="aurora-violet">
+                <span class="theme-swatch swatch-violet"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🌌 Aurora Violet</span>
+                  <span class="theme-opt-desc">Amethyst & Neon Violet</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="arctic-light">
+                <span class="theme-swatch swatch-light"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">☀️ Arctic Forensic</span>
+                  <span class="theme-opt-desc">Clean Titanium Light Mode</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="header-right">

@@ -6,6 +6,7 @@
 const state = {
   user: null,
   token: localStorage.getItem("imposter_token") || null,
+  currentTheme: localStorage.getItem("imposter_theme") || "cyberpunk",
   currentScreen: "auth", // 'auth' | 'dashboard' | 'results'
   currentMode: "upload", // 'upload' | 'camera' | 'audio' | 'url' | 'compare'
   selectedSingleFile: null,
@@ -38,6 +39,14 @@ const elements = {
   btnShowSignup: document.getElementById("btn-show-signup"),
   btnLogout: document.getElementById("btn-logout"),
   brandLogo: document.getElementById("brand-logo"),
+
+  // Theme Switcher Elements
+  themeDropdownWrapper: document.getElementById("theme-dropdown-wrapper"),
+  btnThemeToggle: document.getElementById("btn-theme-toggle"),
+  currentThemeIcon: document.getElementById("current-theme-icon"),
+  currentThemeName: document.getElementById("current-theme-name"),
+  themeMenu: document.getElementById("theme-menu"),
+  themeOptBtns: document.querySelectorAll(".theme-opt-btn"),
 
   // Auth Forms
   tabLoginBtn: document.getElementById("tab-login-btn"),
@@ -155,11 +164,22 @@ const elements = {
   loadingStatusText: document.getElementById("loading-status-text")
 };
 
+// Theme Definitions
+const THEMES = {
+  "cyberpunk": { name: "Cyberpunk", icon: "⚡" },
+  "matrix": { name: "Matrix", icon: "💻" },
+  "federal-navy": { name: "Federal Intel", icon: "🛡️" },
+  "crimson-threat": { name: "Crimson Threat", icon: "🚨" },
+  "aurora-violet": { name: "Aurora Violet", icon: "🌌" },
+  "arctic-light": { name: "Arctic Forensic", icon: "☀️" },
+};
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
+  initTheme();
   setupEventListeners();
   if (state.token) {
     await checkCurrentUserSession();
@@ -168,7 +188,69 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+function initTheme() {
+  const savedTheme = localStorage.getItem("imposter_theme") || "cyberpunk";
+  setTheme(savedTheme);
+}
+
+function setTheme(themeKey) {
+  if (!THEMES[themeKey]) themeKey = "cyberpunk";
+  state.currentTheme = themeKey;
+  localStorage.setItem("imposter_theme", themeKey);
+  
+  if (themeKey === "cyberpunk") {
+    document.documentElement.removeAttribute("data-theme");
+  } else {
+    document.documentElement.setAttribute("data-theme", themeKey);
+  }
+
+  // Update button label and icon
+  const meta = THEMES[themeKey];
+  if (elements.currentThemeIcon) elements.currentThemeIcon.textContent = meta.icon;
+  if (elements.currentThemeName) elements.currentThemeName.textContent = meta.name;
+
+  // Update active state on option buttons
+  elements.themeOptBtns?.forEach(btn => {
+    if (btn.getAttribute("data-theme") === themeKey) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+}
+
 function setupEventListeners() {
+  // Theme Switcher Toggle & Selection
+  elements.btnThemeToggle?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isHidden = elements.themeMenu.classList.contains("hidden");
+    if (isHidden) {
+      elements.themeMenu.classList.remove("hidden");
+      elements.themeDropdownWrapper.classList.add("open");
+    } else {
+      elements.themeMenu.classList.add("hidden");
+      elements.themeDropdownWrapper.classList.remove("open");
+    }
+  });
+
+  elements.themeOptBtns?.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const selected = btn.getAttribute("data-theme");
+      setTheme(selected);
+      elements.themeMenu.classList.add("hidden");
+      elements.themeDropdownWrapper.classList.remove("open");
+    });
+  });
+
+  // Close dropdown on click outside
+  document.addEventListener("click", (e) => {
+    if (!elements.themeDropdownWrapper?.contains(e.target)) {
+      elements.themeMenu?.classList.add("hidden");
+      elements.themeDropdownWrapper?.classList.remove("open");
+    }
+  });
+
   // Navigation & Screen Switchers
   elements.btnShowLogin?.addEventListener("click", () => {
     switchAuthTab("login");
