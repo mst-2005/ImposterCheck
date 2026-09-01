@@ -159,6 +159,12 @@ const elements = {
   mediaDynamicsTitle: document.getElementById("media-dynamics-title"),
   mediaDynamicsContent: document.getElementById("media-dynamics-content"),
 
+  // Samples Modal
+  btnOpenSamplesModal: document.getElementById("btn-open-samples-modal"),
+  btnCloseSamplesModal: document.getElementById("btn-close-samples-modal"),
+  samplesModal: document.getElementById("samples-modal"),
+  samplesCatalogGrid: document.getElementById("samples-catalog-grid"),
+
   // Loading Modal
   loadingOverlay: document.getElementById("loading-overlay"),
   loadingStatusText: document.getElementById("loading-status-text")
@@ -249,6 +255,13 @@ function setupEventListeners() {
       elements.themeMenu?.classList.add("hidden");
       elements.themeDropdownWrapper?.classList.remove("open");
     }
+  });
+
+  // Samples Modal
+  elements.btnOpenSamplesModal?.addEventListener("click", openSamplesModal);
+  elements.btnCloseSamplesModal?.addEventListener("click", closeSamplesModal);
+  elements.samplesModal?.addEventListener("click", (e) => {
+    if (e.target === elements.samplesModal) closeSamplesModal();
   });
 
   // Navigation & Screen Switchers
@@ -1178,3 +1191,100 @@ function formatBytes(bytes, decimals = 1) {
 function formatSignal(str) {
   return str.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 }
+
+// ============================================================================
+// SAMPLES CATALOG & ASSET LOADERS
+// ============================================================================
+
+async function openSamplesModal() {
+  elements.samplesModal.classList.remove("hidden");
+  await loadSamplesCatalog();
+}
+
+function closeSamplesModal() {
+  elements.samplesModal.classList.add("hidden");
+}
+
+async function loadSamplesCatalog() {
+  try {
+    const res = await fetch("/api/v1/samples");
+    const data = await res.json();
+    const container = elements.samplesCatalogGrid;
+    container.innerHTML = "";
+    
+    (data.samples || []).forEach(sample => {
+      const card = document.createElement("div");
+      card.className = "sample-item-card";
+      
+      const expectedClass = sample.expected === "PASS" ? "pass" : (sample.expected === "REJECT" || sample.expected === "IMPOSTER" ? "reject" : "review");
+      
+      card.innerHTML = `
+        <div>
+          <div class="sample-item-top">
+            <span class="sample-category-tag">${sample.category}</span>
+            <span class="verdict-pill ${expectedClass}">${sample.expected}</span>
+          </div>
+          <h4 class="sample-item-title">${sample.title}</h4>
+          <p class="sample-item-desc">${sample.description}</p>
+        </div>
+        <div class="sample-item-actions">
+          <button type="button" class="btn btn-primary btn-sm flex-1 btn-screen-sample" data-file="${sample.filename}">
+            <span>⚡ Screen Now</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm btn-compare-sample" data-file="${sample.filename}" title="Add to Multi-File Comparison">
+            <span>+ Compare</span>
+          </button>
+        </div>
+      `;
+      
+      card.querySelector(".btn-screen-sample")?.addEventListener("click", async () => {
+        closeSamplesModal();
+        await screenSampleFile(sample.filename);
+      });
+
+      card.querySelector(".btn-compare-sample")?.addEventListener("click", async () => {
+        closeSamplesModal();
+        await addSampleToComparison(sample.filename);
+      });
+
+      container.appendChild(card);
+    });
+  } catch (err) {
+    elements.samplesCatalogGrid.innerHTML = `<p style="color:var(--crimson-primary)">Failed to load sample assets: ${err.message}</p>`;
+  }
+}
+
+async function fetchSampleBlob(filename) {
+  const res = await fetch(`/api/v1/samples/${filename}`);
+  if (!res.ok) throw new Error("Could not fetch sample file");
+  const blob = await res.blob();
+  return new File([blob], filename, { type: blob.type || "application/octet-stream" });
+}
+
+async function screenSampleFile(filename) {
+  showLoading(`Loading Sample Asset: ${filename}...`);
+  try {
+    const file = await fetchSampleBlob(filename);
+    hideLoading();
+    switchStudioMode("upload");
+    handleSingleFileSelected(file);
+    await executeSingleScreening(file, "ALEX MERCER");
+  } catch (err) {
+    hideLoading();
+    alert("Error loading sample: " + err.message);
+  }
+}
+
+async function addSampleToComparison(filename) {
+  showLoading(`Adding ${filename} to Comparison Queue...`);
+  try {
+    const file = await fetchSampleBlob(filename);
+    hideLoading();
+    switchStudioMode("compare");
+    addFilesToMultiQueue([file]);
+  } catch (err) {
+    hideLoading();
+    alert("Error adding sample to comparison: " + err.message);
+  }
+}
+
