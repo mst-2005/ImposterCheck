@@ -866,6 +866,45 @@ html, body {
   font-size: 0.92rem;
 }
 
+.demo-banner-btn {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--cyan-primary), #0284c7);
+  box-shadow: 0 4px 20px var(--cyan-glow);
+  font-weight: 700;
+}
+
+.simple-steps-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  max-width: 380px;
+}
+.steps-title {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cyan-primary);
+  display: block;
+  margin-bottom: 8px;
+}
+.steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.steps-list li {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.steps-list strong {
+  color: var(--text-primary);
+}
+
 .quick-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -893,6 +932,7 @@ html, body {
 .text-emerald { color: var(--emerald-primary); }
 .text-purple { color: var(--purple-primary); }
 .text-yellow { color: var(--amber-primary); }
+
 
 /* Mode Switcher Navigation */
 .mode-navigation {

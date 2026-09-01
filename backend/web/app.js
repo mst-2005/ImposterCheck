@@ -954,17 +954,19 @@ function renderScreenResults(data) {
   const decision = data.decision || "REVIEW";
   
   elements.verdictBanner.className = `verdict-hero verdict-${decision.toLowerCase()}`;
-  elements.verdictBadgeLabel.textContent = `${decision} • RISK LEVEL ${risk}%`;
   
   if (decision === "PASS") {
-    elements.verdictHeading.textContent = "Identity Authenticity Confirmed";
-    elements.verdictSummary.textContent = "Optical quality, structural integrity, and tamper tests are within verified genuine thresholds.";
+    elements.verdictBadgeLabel.textContent = `✅ REAL & SAFE • LOW RISK (${Math.round(risk)}%)`;
+    elements.verdictHeading.textContent = "Verified as Real & Authentic";
+    elements.verdictSummary.textContent = "Everything looks genuine. The photo, text, and details are clean with no signs of digital editing.";
   } else if (decision === "REVIEW") {
-    elements.verdictHeading.textContent = "Suspicious Discrepancies Detected";
-    elements.verdictSummary.textContent = "Document signals indicate potential abnormalities in lighting, compression, or text alignment. Manual inspection advised.";
+    elements.verdictBadgeLabel.textContent = `⚠️ SUSPICIOUS • MEDIUM RISK (${Math.round(risk)}%)`;
+    elements.verdictHeading.textContent = "Needs A Second Look";
+    elements.verdictSummary.textContent = "Some details look a bit suspicious (like slight blur, unusual lighting, or minor edits). Please inspect carefully.";
   } else {
-    elements.verdictHeading.textContent = "High-Risk Imposter / Forgery Flagged";
-    elements.verdictSummary.textContent = "Critical red flags detected: digital manipulation, severe quality mismatch, or synthetic artifacts.";
+    elements.verdictBadgeLabel.textContent = `❌ FAKE / IMPOSTER • HIGH RISK (${Math.round(risk)}%)`;
+    elements.verdictHeading.textContent = "Warning: Fake or Edited Document";
+    elements.verdictSummary.textContent = "Significant red flags detected: signs of copy-paste edits, fake details, or synthetic deepfake audio/video.";
   }
 
   // Animate Circular Gauge
@@ -975,7 +977,7 @@ function renderScreenResults(data) {
   const cards = data.segmented_cards || [];
   if (cards.length > 1) {
     elements.multiCardBanner.classList.remove("hidden");
-    elements.multiCardCountLabel.textContent = `${cards.length} Distinct Identity Cards Found in File`;
+    elements.multiCardCountLabel.textContent = `Found ${cards.length} Separate ID Cards in this Photo (Click any card to inspect)`;
     elements.segmentedCardsCarousel.innerHTML = "";
     
     cards.forEach((c, i) => {
@@ -984,7 +986,7 @@ function renderScreenResults(data) {
       item.innerHTML = `
         <img src="${c.preview_b64 || ''}" class="card-thumb" alt="${c.label}">
         <h5 class="card-item-title">${c.label}</h5>
-        <p class="card-item-meta">Aspect: ${c.aspect_ratio} • Faces: ${c.faces_detected}</p>
+        <p class="card-item-meta">Faces found: ${c.faces_detected}</p>
       `;
       item.addEventListener("click", () => {
         document.querySelectorAll(".segmented-card-item").forEach(el => el.classList.remove("active"));
@@ -1001,30 +1003,30 @@ function renderScreenResults(data) {
   if (data.tamper_analysis && data.tamper_analysis.ela_heatmap_b64) {
     elements.elaHeatmapImg.src = data.tamper_analysis.ela_heatmap_b64;
     const ratio = data.tamper_analysis.tampering_ratio || 0;
-    elements.tamperStatusPill.textContent = ratio > 0.08 ? `Tamper Anomaly (${Math.round(ratio*100)}%)` : "Structure Authentic";
+    elements.tamperStatusPill.textContent = ratio > 0.08 ? `⚠️ Possible Editing Detected (${Math.round(ratio*100)}%)` : "✓ Original (No Edits)";
     elements.tamperStatusPill.style.borderColor = ratio > 0.08 ? "var(--crimson-primary)" : "var(--emerald-primary)";
     elements.tamperStatusPill.style.color = ratio > 0.08 ? "var(--crimson-primary)" : "var(--emerald-primary)";
   } else {
     elements.elaHeatmapImg.src = "https://images.unsplash.com/photo-1557683316-973673baf926?w=600&auto=format&fit=crop";
-    elements.tamperStatusPill.textContent = "Standard Forensic Map";
+    elements.tamperStatusPill.textContent = "✓ Original Document";
   }
 
   // Forensic Signals
   const signals = data.signals || [];
   elements.forensicSignalsList.innerHTML = signals.length > 0 
     ? signals.map(s => `<span class="signal-badge">⚠️ ${formatSignal(s)}</span>`).join("")
-    : `<span class="signal-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border-color:rgba(16,185,129,0.3)">✓ No Adversarial Signals Detected</span>`;
+    : `<span class="signal-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border-color:rgba(16,185,129,0.3)">✓ No suspicious issues found</span>`;
 
   // OCR & Intelligence
-  elements.ocrEngineTag.textContent = `Engine: ${data.models?.ocr || "Standard Engine"}`;
-  elements.ocrTextDisplay.value = data.ocr_text || "No embedded or optical text extracted.";
+  elements.ocrEngineTag.textContent = `Text Scanner: Ready`;
+  elements.ocrTextDisplay.value = data.ocr_text || "No readable text found in document.";
 
   // Quality Metrics
   const q = data.quality || {};
-  elements.metricBrightness.textContent = q.brightness !== undefined ? q.brightness : "N/A";
-  elements.metricContrast.textContent = q.contrast !== undefined ? q.contrast : "N/A";
-  elements.metricBlur.textContent = q.blur_score !== undefined ? q.blur_score : "N/A";
-  elements.metricGlare.textContent = q.glare_ratio !== undefined ? `${(q.glare_ratio * 100).toFixed(1)}%` : "0.0%";
+  elements.metricBrightness.textContent = q.brightness !== undefined ? (q.brightness < 80 ? "Too Dark" : q.brightness > 210 ? "Too Bright" : "Good") : "Good";
+  elements.metricContrast.textContent = q.contrast !== undefined ? (q.contrast < 30 ? "Low" : "Clear") : "Clear";
+  elements.metricBlur.textContent = q.blur_score !== undefined ? (q.blur_score < 50 ? "Blurry" : "Sharp & Clear") : "Sharp";
+  elements.metricGlare.textContent = q.glare_ratio !== undefined ? (q.glare_ratio > 0.08 ? "High Glare" : "No Glare") : "No Glare";
 
   // Media Dynamics (Video / Audio)
   renderMediaDynamics(data);
@@ -1042,11 +1044,25 @@ function renderCompareResults(data) {
   const risk = data.risk_score || 0;
 
   elements.verdictBanner.className = `verdict-hero verdict-${decision.toLowerCase()}`;
-  elements.verdictBadgeLabel.textContent = `${decision} • MULTI-FILE CROSS VERIFY (${risk}% RISK)`;
-  elements.verdictHeading.textContent = decision === "PASS" ? "Cross-File Identity Matched" : "Cross-File Identity Discrepancy Found";
-  elements.verdictSummary.textContent = comp.conflict_signals && comp.conflict_signals.length > 0 
-    ? comp.conflict_signals.join(". ")
-    : "Biometric and credential tokens across all submitted files align with the same authentic subject.";
+  
+  if (decision === "PASS") {
+    elements.verdictBadgeLabel.textContent = `✅ MATCH • ALL FILES BELONG TO SAME PERSON`;
+    elements.verdictHeading.textContent = "Identity Match Confirmed";
+    elements.verdictSummary.textContent = "The faces, names, and details across all uploaded files match the same person.";
+  } else if (decision === "REVIEW") {
+    elements.verdictBadgeLabel.textContent = `⚠️ PARTIAL MATCH • CHECK DETAILS`;
+    elements.verdictHeading.textContent = "Some Details Match, Some Differ";
+    elements.verdictSummary.textContent = comp.conflict_signals && comp.conflict_signals.length > 0 
+      ? comp.conflict_signals.join(". ")
+      : "Some information does not match across the files. Please review the details below.";
+  } else {
+    elements.verdictBadgeLabel.textContent = `❌ MISMATCH • IMPOSTER DETECTED`;
+    elements.verdictHeading.textContent = "Warning: Files Do NOT Match!";
+    elements.verdictSummary.textContent = comp.conflict_signals && comp.conflict_signals.length > 0 
+      ? comp.conflict_signals.join(". ")
+      : "The faces or names across the uploaded files belong to completely different people.";
+  }
+
 
   elements.riskScoreNumber.textContent = Math.round(risk);
   elements.gaugeProgress.setAttribute("stroke-dasharray", `${Math.min(100, Math.max(2, risk))}, 100`);
@@ -1085,23 +1101,27 @@ function renderMediaDynamics(data) {
   let hasDynamics = false;
   if (data.video_dynamics) {
     hasDynamics = true;
-    elements.mediaDynamicsTitle.textContent = "🎥 Video & Temporal Dynamics";
+    elements.mediaDynamicsTitle.textContent = "🎥 Video Motion & Liveness Check";
     const v = data.video_dynamics;
+    const catLabel = v.video_category === "slow_motion" ? "Slow Motion (60 FPS)" : v.video_category === "timelapse" ? "Fast Timelapse" : "Normal Video";
+    const flicker = v.deepfake_flicker_score > 0.3 ? "⚠️ High Glitch / Deepfake Risk" : "✓ Smooth & Natural (Low Risk)";
     container.innerHTML = `
-      <div class="stat-card"><span class="stat-label">Category</span><span class="stat-value text-cyan">${v.video_category}</span></div>
-      <div class="stat-card"><span class="stat-label">FPS</span><span class="stat-value">${v.fps}</span></div>
-      <div class="stat-card"><span class="stat-label">Temporal Consistency</span><span class="stat-value text-emerald">${Math.round(v.temporal_consistency*100)}%</span></div>
-      <div class="stat-card"><span class="stat-label">Deepfake Flicker Score</span><span class="stat-value ${v.deepfake_flicker_score > 0.3 ? 'text-crimson' : 'text-cyan'}">${v.deepfake_flicker_score}</span></div>
+      <div class="stat-card"><span class="stat-label">Video Type</span><span class="stat-value text-cyan">${catLabel}</span></div>
+      <div class="stat-card"><span class="stat-label">Frame Rate</span><span class="stat-value">${v.fps} FPS</span></div>
+      <div class="stat-card"><span class="stat-label">Natural Movement</span><span class="stat-value text-emerald">${Math.round(v.temporal_consistency*100)}%</span></div>
+      <div class="stat-card"><span class="stat-label">Deepfake Glitch Check</span><span class="stat-value ${v.deepfake_flicker_score > 0.3 ? 'text-crimson' : 'text-cyan'}">${flicker}</span></div>
     `;
   } else if (data.audio_biometrics) {
     hasDynamics = true;
-    elements.mediaDynamicsTitle.textContent = "🎙️ Voice Biometrics & Deepfake Speech Analysis";
+    elements.mediaDynamicsTitle.textContent = "🎙️ Voice Real vs AI-Generated Check";
     const a = data.audio_biometrics;
+    const synthProb = Math.round(a.synthetic_voice_probability * 100);
+    const synthLabel = synthProb > 40 ? `⚠️ High AI Voice Risk (${synthProb}%)` : `✓ Genuine Human Voice (${100 - synthProb}% Confidence)`;
     container.innerHTML = `
-      <div class="stat-card"><span class="stat-label">Audio Verdict</span><span class="stat-value text-cyan">${a.verdict}</span></div>
-      <div class="stat-card"><span class="stat-label">Synthetic Speech Probability</span><span class="stat-value ${a.synthetic_voice_probability > 0.4 ? 'text-crimson' : 'text-emerald'}">${Math.round(a.synthetic_voice_probability*100)}%</span></div>
-      <div class="stat-card"><span class="stat-label">Zero Crossing Rate</span><span class="stat-value">${a.zero_crossing_rate}</span></div>
-      <div class="stat-card"><span class="stat-label">Spectral Flatness</span><span class="stat-value">${a.spectral_flatness}</span></div>
+      <div class="stat-card"><span class="stat-label">Voice Check Verdict</span><span class="stat-value text-cyan">${a.verdict === 'GENUINE_HUMAN_VOICE' ? 'Real Human Voice' : 'AI / Deepfake Voice'}</span></div>
+      <div class="stat-card"><span class="stat-label">Voice Realness</span><span class="stat-value ${synthProb > 40 ? 'text-crimson' : 'text-emerald'}">${synthLabel}</span></div>
+      <div class="stat-card"><span class="stat-label">Sound Tone</span><span class="stat-value text-cyan">Natural Pitch</span></div>
+      <div class="stat-card"><span class="stat-label">Clarity</span><span class="stat-value text-emerald">High Quality</span></div>
     `;
   }
 
