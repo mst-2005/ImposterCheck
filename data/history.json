@@ -1,0 +1,26 @@
+[
+  {
+    "id": "scan_e18a518d00e4",
+    "user_id": "user_demo_001",
+    "timestamp": "2026-09-01 15:23:13",
+    "decision": "PASS",
+    "risk_score": 25.0,
+    "file_name": "Uploaded document",
+    "file_type": "image",
+    "cards_detected": 1,
+    "is_multi_file": true,
+    "summary": "PASS (Risk: 25.0%)"
+  },
+  {
+    "id": "scan_84c5c7584389",
+    "user_id": "user_demo_001",
+    "timestamp": "2026-09-01 15:23:13",
+    "decision": "PASS",
+    "risk_score": 9.62,
+    "file_name": "multi_card_test.png",
+    "file_type": "image",
+    "cards_detected": 2,
+    "is_multi_file": false,
+    "summary": "PASS (Risk: 9.62%)"
+  }
+]

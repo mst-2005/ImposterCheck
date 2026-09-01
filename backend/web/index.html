@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Imposter Check | NextGen Multi-Modal Identity Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Ambient background glow particles -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand" id="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">THE IMPOSTER CHECK</span>
+          <span class="brand-tag">AI IDENTITY FORENSICS v2.0</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="system-status">
+          <span class="status-pulse"></span>
+          <span class="status-text">AI Verification Core Online</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Logged Out state -->
+        <div id="nav-auth-buttons" class="nav-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="btn-show-login">Sign In</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-show-signup">Create Account</button>
+        </div>
+
+        <!-- Logged In profile dropdown -->
+        <div id="nav-user-profile" class="user-profile-badge hidden">
+          <img id="nav-user-avatar" src="" alt="Avatar" class="user-avatar">
+          <div class="user-info-text">
+            <span id="nav-user-name" class="user-name">User</span>
+            <span id="nav-user-role" class="user-role">Forensic Analyst</span>
+          </div>
+          <button type="button" class="btn-icon" id="btn-logout" title="Sign Out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- ==============================================
+         SCREEN 1: AUTHENTICATION PORTAL (LOGIN / SIGN UP)
+         ============================================== -->
+    <section id="screen-auth" class="screen-view active">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <!-- Auth Hero Header -->
+          <div class="auth-header">
+            <div class="auth-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span>SECURE ACCESS PORTAL</span>
+            </div>
+            <h1 class="auth-title">NextGen Identity Screening</h1>
+            <p class="auth-subtitle">Verify identities across live photos, videos, slow-mo/timelapse, audios, PDFs, DOCX & multi-card files.</p>
+          </div>
+
+          <!-- Auth Tabs -->
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" id="tab-login-btn">Sign In</button>
+            <button type="button" class="auth-tab-btn" id="tab-signup-btn">Create Account</button>
+          </div>
+
+          <!-- Social Login Provider Buttons -->
+          <div class="social-login-grid">
+            <button type="button" class="btn-social" data-provider="google">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8 0-1.3.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="github">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="apple">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.56.65-1.06 1.7-0.93 2.73 1 .08 2.02-.48 2.64-1.23z"/>
+              </svg>
+              <span>Apple</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="microsoft">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#F25022" d="M1 1h10v10H1z"/>
+                <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+                <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+                <path fill="#FFB900" d="M13 13h10v10H13z"/>
+              </svg>
+              <span>Microsoft</span>
+            </button>
+          </div>
+
+          <div class="auth-divider">
+            <span>or continue with email</span>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form id="form-login" class="auth-form">
+            <div class="form-group">
+              <label for="login-email">Email Address</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="login-email" type="email" placeholder="officer@agency.gov or alex.mercer@impostercheck.ai" required value="alex.mercer@impostercheck.ai">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-row-between">
+                <label for="login-password">Password</label>
+                <a href="javascript:void(0)" class="form-link" id="btn-forgot-demo">Forgot Password?</a>
+              </div>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="login-password" type="password" placeholder="••••••••••••" required value="password123">
+              </div>
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" checked id="login-remember">
+                <span>Keep session active on this workstation</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-submit-login">
+              <span>Sign In to Dashboard</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+
+            <!-- Quick Demo Bypass Button -->
+            <button type="button" class="btn btn-secondary btn-block" id="btn-quick-demo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span>Instant Demo Access (Lead Forensic Specialist)</span>
+            </button>
+          </form>
+
+          <!-- SIGN UP FORM -->
+          <form id="form-signup" class="auth-form hidden">
+            <div class="form-group">
+              <label for="signup-name">Full Name</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input id="signup-name" type="text" placeholder="Special Agent Samantha Cole" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-email">Official / Corporate Email</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="signup-email" type="email" placeholder="samantha.cole@security.int" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-role">Department / Role</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <select id="signup-role" class="form-select">
+                  <option value="Forensic Document Examiner">Forensic Document Examiner</option>
+                  <option value="Border Security & Customs Officer">Border Security & Customs Officer</option>
+                  <option value="KYC & AML Fraud Investigator">KYC & AML Fraud Investigator</option>
+                  <option value="Identity Compliance Auditor">Identity Compliance Auditor</option>
+                  <option value="Cybersecurity Intelligence Specialist">Cybersecurity Intelligence Specialist</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-password">Security Passphrase</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="signup-password" type="password" placeholder="Minimum 8 characters" required minlength="6">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-submit-signup">
+              <span>Create Forensic Account</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </button>
+          </form>
+
+          <div id="auth-alert" class="auth-alert hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 2: MAIN DASHBOARD & SCANNING STUDIO HUB
+         ============================================== -->
+    <section id="screen-dashboard" class="screen-view">
+      <div class="dashboard-container">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-left">
+            <div class="welcome-pill">
+              <span class="pulse-dot"></span>
+              <span>VERIFICATION WORKSPACE READY</span>
+            </div>
+            <h1 class="welcome-heading">Welcome to The Imposter Check, <span id="dash-user-name" class="highlight-cyan">Alex Mercer</span>! 👋</h1>
+            <p class="welcome-subtext">Advanced multi-modal forensics initialized. Upload documents, capture live media, extract multi-card files, or cross-verify multiple identities.</p>
+          </div>
+          <div class="welcome-right">
+            <div class="quick-stats-grid">
+              <div class="stat-card">
+                <span class="stat-label">System Mode</span>
+                <span class="stat-value text-cyan">Multi-Modal</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Card Detection</span>
+                <span class="stat-value text-emerald">Multi-Card AI</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Cross-Verify</span>
+                <span class="stat-value text-purple">Multi-File Active</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Audit Engine</span>
+                <span class="stat-value text-yellow">Encrypted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Switcher Tabs -->
+        <div class="mode-navigation">
+          <button type="button" class="mode-tab active" data-mode="upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>Multi-Format Media / Docs</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="camera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Live Camera & Video</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="audio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            <span>Live Audio Biometrics</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="url">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span>URL Asset Scanner</span>
+          </button>
+
+          <button type="button" class="mode-tab mode-tab-compare" data-mode="compare">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"/>
+              <path d="M8 3H3v5"/>
+              <path d="M12 22v-8.3"/>
+              <path d="M9 12 3 6"/>
+              <path d="M15 12l6-6"/>
+            </svg>
+            <span class="compare-badge">Compare 2+ Files (Fake Identity Check)</span>
+          </button>
+        </div>
+
+        <!-- STUDIO CONTENT PANELS -->
+        <div class="studio-container">
+
+          <!-- 1. MULTI-FORMAT FILE UPLOAD PANEL -->
+          <div id="panel-upload" class="studio-panel active">
+            <form id="form-upload-media" class="panel-card">
+              <div class="drop-zone" id="drop-zone-single">
+                <input type="file" id="file-input-single" class="file-input" accept="image/*,video/*,audio/*,.pdf,.docx,.doc">
+                <div class="drop-content">
+                  <div class="drop-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                      <path d="M12 12v9"/>
+                      <path d="m8 17 4-5 4 5"/>
+                    </svg>
+                  </div>
+                  <h3 class="drop-title">Drag & Drop or Click to Select File</h3>
+                  <p class="drop-desc">Accepts <strong>Photos, Live Photos, Videos, Timelapse, Slow-motion, Audio files, PDFs, DOCX</strong>.</p>
+                  
+                  <div class="supported-tags">
+                    <span class="tag">🖼️ Photos (JPG, PNG, WEBP, HEIF)</span>
+                    <span class="tag">🎥 Videos (MP4, MOV, WebM)</span>
+                    <span class="tag">⏱️ Timelapse & Slow-Mo</span>
+                    <span class="tag">🎙️ Audio (WAV, MP3, M4A)</span>
+                    <span class="tag">📄 PDF Documents</span>
+                    <span class="tag">📝 DOCX Files</span>
+                    <span class="tag tag-highlight">🪪 Multi-Card Images</span>
+                  </div>
+                </div>
+
+                <!-- Selected File Display -->
+                <div id="selected-file-preview" class="selected-file-box hidden">
+                  <div class="selected-file-info">
+                    <span class="selected-file-icon" id="preview-type-icon">📁</span>
+                    <div>
+                      <h4 id="preview-file-name" class="selected-name">document.pdf</h4>
+                      <p id="preview-file-meta" class="selected-size">1.4 MB • application/pdf</p>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-icon btn-remove" id="btn-remove-selected">✕</button>
+                </div>
+              </div>
+
+              <div class="form-grid-controls">
+                <div class="form-group flex-1">
+                  <label for="reference-text">Optional Identity Reference (Full Name / ID Number)</label>
+                  <div class="input-with-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <input type="text" id="reference-text" placeholder="e.g. Johnathan Doe / AB1234567">
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-screen">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                  <span>Execute Forensic Scan</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 2. LIVE CAMERA & VIDEO STUDIO PANEL -->
+          <div id="panel-camera" class="studio-panel">
+            <div class="panel-card camera-studio">
+              <div class="camera-layout">
+                <div class="camera-viewport-box">
+                  <video id="camera-video-feed" autoplay playsinline muted></video>
+                  <canvas id="camera-canvas" class="hidden"></canvas>
+                  
+                  <div class="camera-overlay-guides">
+                    <div class="card-guide-frame"></div>
+                    <div class="face-guide-frame"></div>
+                    <div class="scanner-laser-line"></div>
+                  </div>
+
+                  <div id="recording-indicator" class="recording-badge hidden">
+                    <span class="record-pulse"></span>
+                    <span id="recording-timer">REC 00:05</span>
+                  </div>
+                </div>
+
+                <div class="camera-controls-sidebar">
+                  <h3 class="sidebar-title">Live Capture Controls</h3>
+                  <p class="sidebar-desc">Position your ID card or face within the frame guidelines.</p>
+
+                  <div class="camera-actions-stack">
+                    <button type="button" class="btn btn-secondary btn-block" id="btn-start-camera">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10 8 16 12 10 16 10 8"/>
+                      </svg>
+                      <span>Start WebRTC Camera</span>
+                    </button>
+
+                    <button type="button" class="btn btn-primary btn-block" id="btn-capture-photo" disabled>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                      <span>Capture Live Photo</span>
+                    </button>
+
+                    <button type="button" class="btn btn-purple btn-block" id="btn-record-liveness-video" disabled>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="23 7 16 12 23 17 23 7"/>
+                        <rect width="15" height="14" x="1" y="5" rx="2" ry="2"/>
+                      </svg>
+                      <span>Record 5s Liveness Video</span>
+                    </button>
+                  </div>
+
+                  <div id="camera-snapshot-preview" class="snapshot-preview-card hidden">
+                    <span class="preview-label">Captured Media Ready:</span>
+                    <img id="camera-captured-img" src="" alt="Captured">
+                    <button type="button" class="btn btn-primary btn-block btn-sm" id="btn-screen-captured">Screen This Live Media</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. LIVE AUDIO BIOMETRIC STUDIO PANEL -->
+          <div id="panel-audio" class="studio-panel">
+            <div class="panel-card audio-studio">
+              <div class="audio-layout">
+                <div class="audio-visualizer-container">
+                  <canvas id="audio-waveform-canvas" width="600" height="200"></canvas>
+                  <div class="audio-status-overlay">
+                    <span id="audio-studio-status">Microphone Idle • Press Record to capture voice biometric</span>
+                  </div>
+                </div>
+
+                <div class="audio-controls-box">
+                  <button type="button" class="btn btn-primary btn-lg" id="btn-record-audio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                      <line x1="12" y1="19" x2="12" y2="22"/>
+                    </svg>
+                    <span id="record-audio-label">Record Voice Sample</span>
+                  </button>
+
+                  <audio id="audio-playback" controls class="hidden"></audio>
+
+                  <button type="button" class="btn btn-secondary hidden" id="btn-screen-audio-sample">
+                    <span>Analyze Voice for Deepfake/Spoofing</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. URL ASSET SCANNER PANEL -->
+          <div id="panel-url" class="studio-panel">
+            <form id="form-url-screen" class="panel-card">
+              <div class="url-hero">
+                <div class="url-icon">🔗</div>
+                <h3>Remote Web & Cloud Document Verification</h3>
+                <p>Inspect identity documents hosted on remote URLs, cloud storage, or profile links.</p>
+              </div>
+
+              <div class="form-group">
+                <label for="input-target-url">Target Asset URL (HTTP / HTTPS)</label>
+                <div class="input-with-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  <input type="url" id="input-target-url" placeholder="https://example.com/id_documents/sample_passport.png" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-url-reference">Optional Reference String (Expected Name/ID)</label>
+                <input type="text" id="input-url-reference" class="form-input" placeholder="e.g. Alice Smith">
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-url">
+                <span>Fetch & Screen Remote Asset</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- 5. MULTI-FILE IDENTITY COMPARISON PANEL (COMPARE 2+ FILES FOR FAKE IDENTITY) -->
+          <div id="panel-compare" class="studio-panel">
+            <form id="form-multi-compare" class="panel-card compare-studio">
+              <div class="compare-header">
+                <div class="compare-title-row">
+                  <div class="badge-compare-highlight">CROSS-IDENTITY CORRELATION</div>
+                  <h2>Multi-File Identity Comparison Engine</h2>
+                </div>
+                <p>Upload <strong>2 or more files</strong> (e.g. ID Card PDF + Live Selfie Video + Voice Sample + Supporting Passport) to check for <strong>Imposter Fraud, Face Mismatches, and Contradictory Data</strong>.</p>
+              </div>
+
+              <div class="multi-drop-zone" id="drop-zone-multi">
+                <input type="file" id="file-input-multi" class="file-input" multiple accept="image/*,video/*,audio/*,.pdf,.docx,.doc">
+                <div class="multi-drop-prompt">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                    <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/>
+                    <path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/>
+                    <circle cx="8" cy="12" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                  </svg>
+                  <span>Click to select or drag & drop 2+ files to compare</span>
+                </div>
+              </div>
+
+              <!-- Multi-File Selection Queue -->
+              <div id="multi-file-queue" class="multi-file-grid">
+                <!-- Dynamically populated files -->
+              </div>
+
+              <div class="form-grid-controls">
+                <div class="form-group flex-1">
+                  <label for="multi-reference-text">Subject Full Name / Target ID</label>
+                  <input type="text" id="multi-reference-text" class="form-input" placeholder="e.g. John Doe / DL-99201">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-compare" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 3h5v5"/>
+                    <path d="M8 3H3v5"/>
+                    <path d="M12 22v-8.3"/>
+                  </svg>
+                  <span id="btn-compare-label">Compare 0 Files</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- ==============================================
+             RECENT AUDIT LOG & SCAN HISTORY
+             ============================================== -->
+        <div class="history-section">
+          <div class="history-header">
+            <div class="history-title-group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <h3>Recent Forensic Screening Audit Log</h3>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-clear-history">Clear History</button>
+          </div>
+
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Target Document / Media</th>
+                  <th>Type</th>
+                  <th>Cards Found</th>
+                  <th>Risk Score</th>
+                  <th>Verdict</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Dynamically populated -->
+                <tr>
+                  <td colspan="7" class="empty-history-cell">No screenings recorded yet. Upload a document above to begin.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 3: DEEP FORENSIC RESULTS INSPECTOR
+         ============================================== -->
+    <section id="screen-results" class="screen-view">
+      <div class="results-container">
+        
+        <!-- Results Top Navigation -->
+        <div class="results-top-nav">
+          <button type="button" class="btn btn-outline" id="btn-back-to-dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            <span>Back to Scanning Hub</span>
+          </button>
+
+          <div class="results-actions">
+            <button type="button" class="btn btn-secondary" id="btn-export-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Download JSON Dossier</span>
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-print-report">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect width="12" height="8" x="6" y="14"/>
+              </svg>
+              <span>Print Forensic Report</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- HERO VERDICT BANNER -->
+        <div id="verdict-banner" class="verdict-hero verdict-pass">
+          <div class="verdict-main">
+            <div class="verdict-badge" id="verdict-badge-label">PASS - AUTHENTIC</div>
+            <h1 class="verdict-title" id="verdict-heading">Identity Document Verified</h1>
+            <p class="verdict-explanation" id="verdict-summary">No tampering detected. High optical and facial consistency.</p>
+          </div>
+
+          <div class="risk-gauge-box">
+            <div class="gauge-circle">
+              <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path id="gauge-progress" class="circle" stroke-dasharray="15, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="gauge-value">
+                <span id="risk-score-number">15</span><span class="pct">%</span>
+                <span class="gauge-sub">RISK SCORE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MULTI-CARD DETECTION CAROUSEL (IF MULTIPLE IDs IN 1 FILE) -->
+        <div id="multi-card-banner" class="multi-card-strip hidden">
+          <div class="multi-card-header">
+            <div class="multi-card-badge">🪪 MULTIPLE CARDS DETECTED IN FILE</div>
+            <span id="multi-card-count-label">2 Identity Cards Segmented</span>
+          </div>
+          <div id="segmented-cards-carousel" class="cards-carousel-list">
+            <!-- Dynamically populated cards -->
+          </div>
+        </div>
+
+        <!-- MULTI-FILE CROSS COMPARISON MATRIX (IF COMPARING 2+ FILES) -->
+        <div id="multi-file-compare-results" class="compare-results-matrix hidden">
+          <div class="section-card">
+            <h3 class="section-title">⚖️ Cross-File Identity Verification Matrix</h3>
+            <p class="section-desc">Comparison analysis across all submitted files to detect impersonation and forged cross-credentials.</p>
+
+            <div class="compare-score-cards">
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Identity Match Score</span>
+                <span id="comp-overall-score" class="comp-stat-val text-cyan">94.5%</span>
+              </div>
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Face Biometric Congruence</span>
+                <span id="comp-face-score" class="comp-stat-val text-emerald">96.2%</span>
+              </div>
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Text & ID Consistency</span>
+                <span id="comp-text-score" class="comp-stat-val text-purple">92.0%</span>
+              </div>
+            </div>
+
+            <div id="pairwise-matches-list" class="pairwise-grid">
+              <!-- Dynamically populated pairwise cards -->
+            </div>
+          </div>
+        </div>
+
+        <!-- DETAILED FORENSIC TABS -->
+        <div class="forensic-grid">
+          
+          <!-- Column 1: Visual & Tamper Inspection -->
+          <div class="section-card">
+            <h3 class="section-title">🔍 Visual Tampering & ELA Heatmap</h3>
+            <p class="section-desc">Error Level Analysis highlighting digital splicing, pixel anomalies, and clone stamps.</p>
+            
+            <div class="tamper-viewer">
+              <img id="ela-heatmap-img" src="" alt="ELA Heatmap" class="tamper-img">
+              <div id="tamper-status-pill" class="tamper-pill">Structure Authentic</div>
+            </div>
+
+            <div class="signals-list-box">
+              <h4 class="sub-heading">Detected Forensic Signals:</h4>
+              <div id="forensic-signals-list" class="signals-tags">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: OCR Text & Entity Extraction -->
+          <div class="section-card">
+            <h3 class="section-title">📝 OCR & Entity Intelligence</h3>
+            <p class="section-desc">Extracted text tokens, document numbers, and reference string similarity.</p>
+
+            <div class="ocr-box">
+              <div class="ocr-header-row">
+                <span class="ocr-engine-tag" id="ocr-engine-tag">Engine: PaddleOCR / High-Speed</span>
+                <span class="ocr-sim-tag" id="ocr-sim-tag">Ref Match: 100%</span>
+              </div>
+              <textarea id="ocr-text-display" class="ocr-textarea" readonly placeholder="No text extracted"></textarea>
+            </div>
+
+            <div class="quality-metrics-grid">
+              <div class="metric-pill">
+                <span class="metric-lbl">Brightness</span>
+                <span class="metric-val" id="metric-brightness">176.5</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Contrast</span>
+                <span class="metric-val" id="metric-contrast">23.3</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Sharpness / Blur</span>
+                <span class="metric-val" id="metric-blur">1250.1</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Glare Ratio</span>
+                <span class="metric-val" id="metric-glare">0.00%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Additional Media Dynamics (Video / Audio if present) -->
+        <div id="media-dynamics-card" class="section-card hidden">
+          <h3 class="section-title" id="media-dynamics-title">🎥 Video & Audio Forensics</h3>
+          <div id="media-dynamics-content" class="dynamics-grid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Loading Modal Overlay -->
+  <div id="loading-overlay" class="loading-modal hidden">
+    <div class="loading-box">
+      <div class="scanner-spinner"></div>
+      <h3 class="loading-title">Analyzing Media Intelligence</h3>
+      <p class="loading-text" id="loading-status-text">Performing multi-card segmentation & error level analysis...</p>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
