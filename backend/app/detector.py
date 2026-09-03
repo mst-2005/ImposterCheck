@@ -166,8 +166,11 @@ def generate_ela_heatmap(image: np.ndarray, quality: int = 90) -> Tuple[str, flo
         # Enhance difference to make tampering visually obvious
         enhanced = ImageEnhance.Brightness(diff).enhance(scale * 1.5)
         
-        # Convert to heatmap color visualization with OpenCV
+        # Calculate tampering anomaly score via ELA standard deviation and outlier density
         diff_arr = np.array(enhanced.convert("L"))
+        diff_raw = np.array(diff.convert("L"), dtype=np.float32)
+        ela_std = float(np.std(diff_raw))
+        
         heatmap = cv2.applyColorMap(diff_arr, cv2.COLORMAP_JET)
         
         # Blend with original
@@ -178,9 +181,9 @@ def generate_ela_heatmap(image: np.ndarray, quality: int = 90) -> Tuple[str, flo
         _, buf = cv2.imencode('.jpg', blended, [cv2.IMWRITE_JPEG_QUALITY, 85])
         ela_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode('utf-8')
         
-        # Anomaly percentage (high localized variance indicates digital splice/copy-move)
-        anomaly_ratio = float((diff_arr > 60).mean())
-        return ela_b64, round(anomaly_ratio, 4)
+        # Normalized tampering ratio (0.0 to 1.0)
+        tampering_ratio = round(min(1.0, max(0.0, (ela_std - 1.5) / 10.0)), 4)
+        return ela_b64, tampering_ratio
     except Exception:
         return "", 0.0
 
@@ -195,19 +198,21 @@ def compute_noise_inconsistency(image: np.ndarray) -> float:
         med = cv2.medianBlur(gray, 3)
         noise = cv2.absdiff(gray, med)
         h, w = noise.shape
-        bh, bw = max(8, h // 8), max(8, w // 8)
+        bh, bw = max(16, h // 8), max(16, w // 8)
         variances = []
         for y in range(0, h - bh + 1, bh):
             for x in range(0, w - bw + 1, bw):
                 patch = noise[y:y+bh, x:x+bw]
                 variances.append(float(np.var(patch)))
-        if not variances:
+        if len(variances) < 4:
             return 0.0
         v_arr = np.array(variances)
         mean_v = np.mean(v_arr)
         if mean_v < 1e-5:
             return 0.0
-        return float(round(float(np.std(v_arr) / (mean_v + 1e-4)), 4))
+        std_v = np.std(v_arr)
+        score = min(1.0, max(0.0, (std_v / (mean_v + 1e-4) - 0.8) / 2.5))
+        return float(round(score, 4))
     except Exception:
         return 0.0
 
@@ -224,18 +229,22 @@ def compute_moire_energy(image: np.ndarray) -> float:
         fshift = np.fft.fftshift(f)
         magnitude = np.abs(fshift)
         
-        # Mask out center low-frequency DC component
+        # High-frequency ring
         cy, cx = h // 2, w // 2
-        r = min(h, w) // 8
+        r_in = min(h, w) // 6
+        r_out = min(h, w) // 2
         y, x = np.ogrid[:h, :w]
-        mask = (x - cx)**2 + (y - cy)**2 > r**2
+        dist = np.sqrt((x - cx)**2 + (y - cy)**2)
+        mask = (dist >= r_in) & (dist <= r_out)
         
         high_freq = magnitude[mask]
         if len(high_freq) == 0:
             return 0.0
-        max_hf = float(np.max(high_freq))
-        mean_hf = float(np.mean(high_freq))
-        energy = min(1.0, (max_hf / (mean_hf + 1e-5)) / 40.0)
+            
+        p99 = np.percentile(high_freq, 99.5)
+        p50 = np.percentile(high_freq, 50.0) + 1e-5
+        ratio = float(p99 / p50)
+        energy = min(1.0, max(0.0, (ratio - 8.0) / 15.0))
         return float(round(energy, 4))
     except Exception:
         return 0.0

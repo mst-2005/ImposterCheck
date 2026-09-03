@@ -72,14 +72,43 @@ def reference_similarity(a: str, b: str) -> float:
     sa, sb = set(a.split()), set(b.split())
     return round(100 * len(sa & sb) / max(1, len(sa | sb)), 2)
 
+_EFFICIENTNET_MODEL = None
+_XGB_MODEL = None
+
+def _get_efficientnet():
+    global _EFFICIENTNET_MODEL
+    if _EFFICIENTNET_MODEL is None:
+        model_path = MODELS / "efficientnetb0_document.keras"
+        if model_path.exists():
+            try:
+                import tensorflow as tf
+                _EFFICIENTNET_MODEL = tf.keras.models.load_model(model_path)
+            except Exception:
+                _EFFICIENTNET_MODEL = False
+        else:
+            _EFFICIENTNET_MODEL = False
+    return _EFFICIENTNET_MODEL if _EFFICIENTNET_MODEL is not False else None
+
+def _get_xgb():
+    global _XGB_MODEL
+    if _XGB_MODEL is None:
+        path = MODELS / "fraud_xgboost.joblib"
+        if path.exists():
+            try:
+                import joblib
+                _XGB_MODEL = joblib.load(path)
+            except Exception:
+                _XGB_MODEL = False
+        else:
+            _XGB_MODEL = False
+    return _XGB_MODEL if _XGB_MODEL is not False else None
+
 def efficientnet_score(image: np.ndarray) -> tuple[Optional[float], str]:
-    model_path = MODELS / "efficientnetb0_document.keras"
-    if not model_path.exists():
+    model = _get_efficientnet()
+    if model is None:
         return None, "OpenCV fallback"
     try:
-        import tensorflow as tf
         from PIL import Image
-        model = tf.keras.models.load_model(model_path)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pil = Image.fromarray(rgb).resize((224, 224))
         x = np.asarray(pil, dtype=np.float32)
@@ -95,12 +124,10 @@ def build_features(q: dict, ocr_confidence: float, similarity: float, visual_sco
                       visual_score, ela_tamper, noise_inc, moire_val]], dtype=float)
 
 def xgb_score(features: np.ndarray) -> tuple[Optional[float], str]:
-    path = MODELS / "fraud_xgboost.joblib"
-    if not path.exists():
+    model = _get_xgb()
+    if model is None:
         return None, "weighted fallback"
     try:
-        import joblib
-        model = joblib.load(path)
         p = float(model.predict_proba(features)[0, 1])
         return p, "XGBoost"
     except Exception:

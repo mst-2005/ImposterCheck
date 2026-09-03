@@ -318,19 +318,37 @@ def parse_audio_bytes(raw_bytes: bytes, filename: str = "audio.wav") -> Dict[str
                 flatness = float(geom_mean / max(arith_mean, 1e-8))
                 metadata["spectral_flatness"] = round(flatness, 4)
                 
-                # Synthetic speech detectors: TTS / Vocoder artifacts typically have abnormal harmonic spacing
-                synth_score = 0.08
+                # Vocal Intonation / Pitch Jitter Analysis (Auto-correlation across 50ms windows)
+                win_size = int(framerate * 0.05)
+                lags = []
+                for i in range(0, len(norm_data) - win_size, max(1, win_size // 2)):
+                    w = norm_data[i:i+win_size]
+                    corr = np.correlate(w, w, mode='full')[win_size-1:]
+                    min_lag = max(20, int(framerate / 400)) # 400Hz ceiling
+                    max_lag = min(len(corr), int(framerate / 50))  # 50Hz floor
+                    if max_lag > min_lag:
+                        peak_lag = min_lag + np.argmax(corr[min_lag:max_lag])
+                        lags.append(peak_lag)
+                
+                pitch_std = float(np.std(lags)) if len(lags) > 3 else 0.0
+                metadata["pitch_variance"] = round(pitch_std, 2)
+
+                # Synthetic speech detectors: TTS / Vocoder artifacts
+                synth_score = 0.05
+                if pitch_std < 1.2:
+                    synth_score += 0.75
+                    metadata["audio_signals"].append("rigid_unnatural_pitch_profile")
                 if flatness < 0.0001:
-                    synth_score += 0.45
+                    synth_score += 0.40
                     metadata["audio_signals"].append("robotic_spectral_peaks")
                 if zcr < 0.01 or zcr > 0.35:
-                    synth_score += 0.35
+                    synth_score += 0.30
                     metadata["audio_signals"].append("atypical_zero_crossing_rate")
                 if metadata["duration_seconds"] < 0.5:
                     metadata["audio_signals"].append("insufficient_audio_length")
 
                 metadata["synthetic_voice_probability"] = round(min(0.99, synth_score), 2)
-                if metadata["synthetic_voice_probability"] > 0.5:
+                if metadata["synthetic_voice_probability"] >= 0.40:
                     metadata["verdict"] = "SUSPICIOUS_AI_GENERATED_VOICE"
                 else:
                     metadata["verdict"] = "GENUINE_HUMAN_VOICE"
