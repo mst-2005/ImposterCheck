@@ -77,3 +77,42 @@ def test_multi_file_comparison():
     assert "comparison" in res
     assert res["comparison"]["total_files_evaluated"] == 2
     assert res["decision"] in ["PASS", "REVIEW", "REJECT"]
+
+def test_zero_false_negatives_on_tampered_id():
+    """
+    Guarantees that a forged/spliced/tampered ID document is NEVER classified as PASS.
+    """
+    # Create base card
+    card = np.full((380, 600, 3), (245, 248, 250), dtype=np.uint8)
+    cv2.rectangle(card, (0, 0), (600, 60), (180, 80, 20), -1)
+    cv2.putText(card, "STATE DRIVER LICENSE", (20, 40), cv2.FONT_HERSHEY_DUPLEX, 0.75, (255, 255, 255), 2)
+    
+    # Inject digital text splice with high noise & mismatched compression
+    patch = np.full((34, 260, 3), (255, 255, 210), dtype=np.uint8)
+    noise = np.random.randint(-40, 40, patch.shape, dtype=np.int16)
+    patch = np.clip(patch.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+    cv2.putText(patch, "FORGED: IMPOSTER", (8, 24), cv2.FONT_HERSHEY_COMPLEX, 0.55, (160, 0, 0), 2)
+    card[88:122, 165:425] = patch
+    cv2.rectangle(card, (165, 88), (425, 122), (0, 0, 255), 1)
+    
+    res = screen(card, reference="MAHITA THUNDIYIL", filename="tampered_test.png")
+    
+    # Zero False Negative assertion: Must NEVER be PASS
+    assert res["decision"] != "PASS", f"False Negative detected! Tampered document received decision: {res['decision']} (risk: {res['risk_score']})"
+    assert res["risk_score"] >= 70.0
+    assert "possible_digital_tampering" in res["signals"] or "inconsistent_noise_distribution" in res["signals"]
+
+def test_screen_replay_attack_rejected():
+    """
+    Guarantees that photographing a screen (Moire presentation attack) is detected and rejected.
+    """
+    h, w = 380, 600
+    card = np.full((h, w, 3), 200, dtype=np.uint8)
+    y, x = np.mgrid[0:h, 0:w]
+    moire = (25 * np.sin(x / 1.8) * np.cos(y / 1.8)).astype(np.int16)
+    moire_3d = np.repeat(moire[:, :, np.newaxis], 3, axis=2)
+    replayed = np.clip(card.astype(np.int16) + moire_3d, 0, 255).astype(np.uint8)
+    
+    res = screen(replayed, filename="screen_replay.png")
+    assert res["decision"] in ["REJECT", "REVIEW"]
+    assert res["tamper_analysis"]["moire_energy"] > 0.05

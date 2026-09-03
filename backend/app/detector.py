@@ -183,3 +183,91 @@ def generate_ela_heatmap(image: np.ndarray, quality: int = 90) -> Tuple[str, flo
         return ela_b64, round(anomaly_ratio, 4)
     except Exception:
         return "", 0.0
+
+def compute_noise_inconsistency(image: np.ndarray) -> float:
+    """
+    Noise Residual Inconsistency (NRI):
+    Estimates high-pass camera sensor noise residuals across grid blocks.
+    Spliced or edited regions exhibit abrupt noise variance discrepancies.
+    """
+    try:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        med = cv2.medianBlur(gray, 3)
+        noise = cv2.absdiff(gray, med)
+        h, w = noise.shape
+        bh, bw = max(8, h // 8), max(8, w // 8)
+        variances = []
+        for y in range(0, h - bh + 1, bh):
+            for x in range(0, w - bw + 1, bw):
+                patch = noise[y:y+bh, x:x+bw]
+                variances.append(float(np.var(patch)))
+        if not variances:
+            return 0.0
+        v_arr = np.array(variances)
+        mean_v = np.mean(v_arr)
+        if mean_v < 1e-5:
+            return 0.0
+        return float(round(float(np.std(v_arr) / (mean_v + 1e-4)), 4))
+    except Exception:
+        return 0.0
+
+def compute_moire_energy(image: np.ndarray) -> float:
+    """
+    Screen Presentation Attack / Moire Pattern Detection:
+    Performs 2D Fast Fourier Transform (FFT) on the image. Screens (phones/monitors)
+    exhibit prominent periodic harmonic spikes in the high-frequency spectrum.
+    """
+    try:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        h, w = gray.shape
+        f = np.fft.fft2(gray)
+        fshift = np.fft.fftshift(f)
+        magnitude = np.abs(fshift)
+        
+        # Mask out center low-frequency DC component
+        cy, cx = h // 2, w // 2
+        r = min(h, w) // 8
+        y, x = np.ogrid[:h, :w]
+        mask = (x - cx)**2 + (y - cy)**2 > r**2
+        
+        high_freq = magnitude[mask]
+        if len(high_freq) == 0:
+            return 0.0
+        max_hf = float(np.max(high_freq))
+        mean_hf = float(np.mean(high_freq))
+        energy = min(1.0, (max_hf / (mean_hf + 1e-5)) / 40.0)
+        return float(round(energy, 4))
+    except Exception:
+        return 0.0
+
+def detect_copy_move_tampering(image: np.ndarray) -> Tuple[bool, float]:
+    """
+    Copy-Move Cloning Detection:
+    Detects duplicated stamps, numbers, or cloned visual patches using ORB keypoint matching.
+    """
+    try:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        orb = cv2.ORB_create(nfeatures=500)
+        kps, des = orb.detectAndCompute(gray, None)
+        if des is None or len(kps) < 15:
+            return False, 0.0
+            
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+        matches = bf.knnMatch(des, des, k=2)
+        
+        cloned_pairs = 0
+        for m_tuple in matches:
+            if len(m_tuple) == 2:
+                m, n = m_tuple
+                # Test if 2nd nearest neighbor is extremely close (duplicate patch)
+                if m.distance < 0.65 * n.distance and m.queryIdx != n.trainIdx:
+                    pt1 = np.array(kps[m.queryIdx].pt)
+                    pt2 = np.array(kps[m.trainIdx].pt)
+                    spatial_dist = np.linalg.norm(pt1 - pt2)
+                    if spatial_dist > 25.0: # Separate spatial regions
+                        cloned_pairs += 1
+                        
+        ratio = round(cloned_pairs / max(1, len(kps)), 4)
+        return cloned_pairs >= 4, ratio
+    except Exception:
+        return False, 0.0

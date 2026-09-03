@@ -10,7 +10,10 @@ from .parsers import (
     parse_image_bytes, parse_pdf_bytes, parse_docx_bytes, parse_video_bytes,
     parse_audio_bytes, fetch_url_resource
 )
-from .detector import detect_faces, detect_multiple_cards, generate_ela_heatmap
+from .detector import (
+    detect_faces, detect_multiple_cards, generate_ela_heatmap,
+    compute_noise_inconsistency, compute_moire_energy, detect_copy_move_tampering
+)
 from .comparator import cross_compare_files
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -79,16 +82,17 @@ def efficientnet_score(image: np.ndarray) -> tuple[Optional[float], str]:
         model = tf.keras.models.load_model(model_path)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pil = Image.fromarray(rgb).resize((224, 224))
-        x = np.asarray(pil, dtype=np.float32) / 255.0
+        x = np.asarray(pil, dtype=np.float32)
         pred = model.predict(x[None, ...], verbose=0).reshape(-1)
         return float(pred[0]), "EfficientNetB0"
     except Exception:
         return None, "OpenCV fallback"
 
-def build_features(q: dict, ocr_confidence: float, similarity: float, visual_score: float) -> np.ndarray:
+def build_features(q: dict, ocr_confidence: float, similarity: float, visual_score: float,
+                   ela_tamper: float, noise_inc: float, moire_val: float) -> np.ndarray:
     return np.array([[q["brightness"], q["contrast"], q["blur_score"],
                       q["glare_ratio"], ocr_confidence, similarity,
-                      visual_score]], dtype=float)
+                      visual_score, ela_tamper, noise_inc, moire_val]], dtype=float)
 
 def xgb_score(features: np.ndarray) -> tuple[Optional[float], str]:
     path = MODELS / "fraud_xgboost.joblib"
@@ -110,30 +114,67 @@ def screen(image: np.ndarray, reference: str = "", filename: str = "document.png
 
     # Multi-card detection: check if one file contains multiple ID cards
     cards = detect_multiple_cards(image)
+    if len(cards) > 1:
+        signals.append("multiple_cards_in_document")
     
     # Global face detection
     faces = detect_faces(image)
     
-    # ELA tampering heatmap
+    # 1. Error Level Analysis (ELA)
     ela_b64, tampering_ratio = generate_ela_heatmap(image)
-    if tampering_ratio > 0.08:
+    if tampering_ratio > 0.05:
         signals.append("possible_digital_tampering")
 
+    # 2. Noise Residual Inconsistency (NRI)
+    noise_inc = compute_noise_inconsistency(image)
+    if noise_inc > 0.35:
+        signals.append("inconsistent_noise_distribution")
+
+    # 3. Screen Replay Moire Frequency Detection
+    moire_energy = compute_moire_energy(image)
+    if moire_energy > 0.07:
+        signals.append("screen_replay_presentation_attack")
+
+    # 4. Copy-Move Forgery Detection
+    is_cloned, clone_ratio = detect_copy_move_tampering(image)
+    if is_cloned:
+        signals.append("cloned_copy_move_patches")
+
+    # Visual Deep Learning Score
     visual, visual_engine = efficientnet_score(image)
     if visual is None:
-        visual = min(1.0, len(signals) / 5.0)
+        visual = min(1.0, (tampering_ratio * 3.0 + noise_inc * 1.5 + moire_energy * 2.0) / 2.0)
 
     ocr_conf = 1.0 if text else 0.0
-    features = build_features(q, ocr_conf, sim, visual)
+    features = build_features(q, ocr_conf, sim, visual, tampering_ratio, noise_inc, moire_energy)
     fraud, fraud_engine = xgb_score(features)
 
     if fraud is None:
         quality_risk = min(1.0, len(signals) / 4.0)
-        match_risk = 0.0 if sim >= 40 or not reference else 0.45
-        tamper_risk = min(1.0, tampering_ratio * 3.0)
-        fraud = min(1.0, 0.35 * visual + 0.25 * quality_risk + 0.20 * match_risk + 0.20 * tamper_risk)
+        match_risk = 0.0 if (sim >= 40 or not reference) else 0.50
+        tamper_risk = min(1.0, tampering_ratio * 4.0 + noise_inc * 1.5 + moire_energy * 2.5)
+        fraud = min(1.0, 0.40 * visual + 0.35 * tamper_risk + 0.15 * match_risk + 0.10 * quality_risk)
 
     risk = round(100 * fraud, 2)
+
+    # -------------------------------------------------------------
+    # ZERO FALSE-NEGATIVE GUARDRAILS:
+    # Strictly prevent forged, tampered, spliced, or replayed assets
+    # from mistakenly receiving a PASS verdict.
+    # -------------------------------------------------------------
+    is_hard_fraud = (
+        tampering_ratio > 0.06 or
+        noise_inc > 0.40 or
+        moire_energy > 0.08 or
+        is_cloned or
+        (reference and text and sim < 25.0)
+    )
+
+    if is_hard_fraud:
+        risk = max(risk, 78.5)
+        if "possible_digital_tampering" not in signals and tampering_ratio > 0.04:
+            signals.append("possible_digital_tampering")
+
     decision = "PASS" if risk < 35 else ("REVIEW" if risk < 70 else "REJECT")
 
     meta = {
@@ -169,7 +210,9 @@ def screen(image: np.ndarray, reference: str = "", filename: str = "document.png
         "tamper_analysis": {
             "ela_heatmap_b64": ela_b64,
             "tampering_ratio": tampering_ratio,
-            "verdict": "FLAGGED_TAMPERING" if tampering_ratio > 0.08 else "AUTHENTIC_STRUCTURE"
+            "noise_inconsistency": noise_inc,
+            "moire_energy": moire_energy,
+            "verdict": "FLAGGED_TAMPERING" if (tampering_ratio > 0.05 or noise_inc > 0.35 or is_cloned) else "AUTHENTIC_STRUCTURE"
         }
     }
 
