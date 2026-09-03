@@ -144,6 +144,7 @@ const elements = {
   compTextScore: document.getElementById("comp-text-score"),
   pairwiseMatchesList: document.getElementById("pairwise-matches-list"),
 
+  forensicGrid: document.querySelector(".forensic-grid"),
   elaHeatmapImg: document.getElementById("ela-heatmap-img"),
   tamperStatusPill: document.getElementById("tamper-status-pill"),
   forensicSignalsList: document.getElementById("forensic-signals-list"),
@@ -363,6 +364,12 @@ function showScreen(screenId) {
   elements.screenDashboard.classList.remove("active");
   elements.screenResults.classList.remove("active");
 
+  // Safely stop background media streams if leaving dashboard
+  if (screenId !== "dashboard") {
+    if (state.cameraStream) stopCameraFeed();
+    if (state.audioStream) stopAudioRecording();
+  }
+
   if (screenId === "auth") {
     elements.screenAuth.classList.add("active");
     elements.navAuthButtons.classList.remove("hidden");
@@ -410,6 +417,10 @@ function switchStudioMode(mode) {
   // Stop camera if leaving camera panel
   if (mode !== "camera" && state.cameraStream) {
     stopCameraFeed();
+  }
+  // Stop audio recording if leaving audio panel
+  if (mode !== "audio" && state.audioStream) {
+    stopAudioRecording();
   }
 }
 
@@ -1050,7 +1061,8 @@ function renderScreenResults(data) {
   showScreen("results");
 
   // Multi-File vs Single File layout adjustments
-  elements.multiFileCompareResults.classList.add("hidden");
+  elements.multiFileCompareResults?.classList.add("hidden");
+  elements.forensicGrid?.classList.remove("hidden");
 
   // Verdict Banner
   const risk = data.risk_score || 0;
@@ -1139,8 +1151,10 @@ function renderCompareResults(data) {
   state.lastScanResult = data;
   showScreen("results");
 
-  elements.multiCardBanner.classList.add("hidden");
-  elements.multiFileCompareResults.classList.remove("hidden");
+  elements.multiCardBanner?.classList.add("hidden");
+  elements.multiFileCompareResults?.classList.remove("hidden");
+  elements.forensicGrid?.classList.add("hidden");
+  elements.mediaDynamicsCard?.classList.add("hidden");
 
   const comp = data.comparison || {};
   const decision = data.decision || "REVIEW";
