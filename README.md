@@ -1,7 +1,6 @@
 # 🛡️ THE IMPOSTER CHECK (SIH26188)
 ### *Next-Generation Multi-Modal AI Identity Verification & Forensic Deepfake Defense System*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![TensorFlow / Keras](https://img.shields.io/badge/TensorFlow-2.18-FF6F00.svg?logo=tensorflow)](https://tensorflow.org)
