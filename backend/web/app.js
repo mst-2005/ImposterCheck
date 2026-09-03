@@ -39,6 +39,41 @@ const elements = {
   btnShowSignup: document.getElementById("btn-show-signup"),
   btnLogout: document.getElementById("btn-logout"),
   brandLogo: document.getElementById("brand-logo"),
+  brandDropdownWrapper: document.getElementById("brand-dropdown-wrapper"),
+  brandDropdownMenu: document.getElementById("brand-dropdown-menu"),
+  brandTabItems: document.querySelectorAll(".brand-tab-item"),
+  btnBrandOpenProfile: document.getElementById("btn-brand-open-profile"),
+  brandMenuBtnProfile: document.getElementById("brand-menu-btn-profile"),
+  brandMenuUserAvatar: document.getElementById("brand-menu-user-avatar"),
+  brandMenuUserName: document.getElementById("brand-menu-user-name"),
+  brandMenuUserRole: document.getElementById("brand-menu-user-role"),
+  btnHeaderProfileModal: document.getElementById("btn-header-profile-modal"),
+  btnNavSettings: document.getElementById("btn-nav-settings"),
+
+  // Profile Settings Modal Elements
+  modalProfileSettings: document.getElementById("modal-profile-settings"),
+  btnCloseProfileModal: document.getElementById("btn-close-profile-modal"),
+  btnCancelProfile: document.getElementById("btn-cancel-profile"),
+  btnSaveProfile: document.getElementById("btn-save-profile"),
+  profilePreviewAvatar: document.getElementById("profile-preview-avatar"),
+  profilePreviewNameLabel: document.getElementById("profile-preview-name-label"),
+  profilePreviewRoleLabel: document.getElementById("profile-preview-role-label"),
+  profileFileInput: document.getElementById("profile-file-input"),
+  btnAvatarWebcamSnapshot: document.getElementById("btn-avatar-webcam-snapshot"),
+  btnAvatarReset: document.getElementById("btn-avatar-reset"),
+  avatarPresetBtns: document.querySelectorAll(".avatar-preset-btn"),
+  profileAvatarUrlInput: document.getElementById("profile-avatar-url-input"),
+  btnApplyAvatarUrl: document.getElementById("btn-apply-avatar-url"),
+  profileInputName: document.getElementById("profile-input-name"),
+  profileInputEmail: document.getElementById("profile-input-email"),
+  profileInputRole: document.getElementById("profile-input-role"),
+  profileInputOrg: document.getElementById("profile-input-org"),
+  profileInputBadge: document.getElementById("profile-input-badge"),
+  profileInputBio: document.getElementById("profile-input-bio"),
+  prefSensitivity: document.getElementById("pref-sensitivity"),
+  prefSoundEffects: document.getElementById("pref-sound-effects"),
+  pref2fa: document.getElementById("pref-2fa"),
+  prefAutoSaveHistory: document.getElementById("pref-auto-save-history"),
 
   // Theme Switcher Elements
   themeDropdownWrapper: document.getElementById("theme-dropdown-wrapper"),
@@ -291,11 +326,11 @@ function setupEventListeners() {
     showScreen("auth");
   });
   elements.btnLogout?.addEventListener("click", handleLogout);
-  elements.brandLogo?.addEventListener("click", () => {
-    if (state.user) showScreen("dashboard");
-    else showScreen("auth");
-  });
   elements.btnBackToDashboard?.addEventListener("click", () => showScreen("dashboard"));
+
+  // Brand Logo Menu & Profile Settings Initializers
+  initBrandDropdown();
+  initProfileSettings();
 
   // Auth Tabs
   elements.tabLoginBtn?.addEventListener("click", () => switchAuthTab("login"));
@@ -695,17 +730,31 @@ function handleQuickDemoLogin() {
 
 
 function onAuthSuccess(user, token) {
+  // Check for local custom profile overrides if saved
+  try {
+    const savedLocalProfile = localStorage.getItem("imposter_user_profile");
+    if (savedLocalProfile) {
+      const parsed = JSON.parse(savedLocalProfile);
+      if (parsed && (parsed.id === user.id || parsed.email === user.email)) {
+        user = { ...user, ...parsed };
+      }
+    }
+  } catch (e) {}
+
   state.user = user;
   state.token = token;
   localStorage.setItem("imposter_token", token);
 
   // Update Navigation Profile
-  elements.navUserName.textContent = user.name;
-  elements.navUserRole.textContent = user.role || "Forensic Specialist";
-  elements.navUserAvatar.src = user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`;
+  if (elements.navUserName) elements.navUserName.textContent = user.name;
+  if (elements.navUserRole) elements.navUserRole.textContent = user.role || "Forensic Specialist";
+  if (elements.navUserAvatar) elements.navUserAvatar.src = user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.name)}`;
 
   // Update Welcome Banner
-  elements.dashUserName.textContent = user.name;
+  if (elements.dashUserName) elements.dashUserName.textContent = user.name;
+
+  // Update Brand Logo Menu Footer
+  updateBrandDropdownUser();
 
   showScreen("dashboard");
 }
@@ -714,6 +763,7 @@ function handleLogout() {
   state.user = null;
   state.token = null;
   localStorage.removeItem("imposter_token");
+  updateBrandDropdownUser();
   showScreen("auth");
 }
 
@@ -1546,5 +1596,371 @@ async function addSampleToComparison(filename) {
     hideLoading();
     alert("Error adding sample to comparison: " + err.message);
   }
+}
+
+// ============================================================================
+// BRAND LOGO MENU & NAVIGATION TABS CONTROLLER
+// ============================================================================
+
+function initBrandDropdown() {
+  elements.brandLogo?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = elements.brandDropdownWrapper?.classList.contains("open");
+    if (isOpen) {
+      closeBrandDropdown();
+    } else {
+      openBrandDropdown();
+    }
+  });
+
+  // Handle Tab selections in Logo Dropdown
+  elements.brandTabItems?.forEach(tab => {
+    tab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const targetTab = tab.getAttribute("data-tab");
+      handleBrandTabNavigation(targetTab);
+      closeBrandDropdown();
+    });
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener("click", (e) => {
+    if (!elements.brandDropdownWrapper?.contains(e.target)) {
+      closeBrandDropdown();
+    }
+  });
+
+  elements.brandMenuBtnProfile?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeBrandDropdown();
+    openProfileModal();
+  });
+}
+
+function openBrandDropdown() {
+  elements.brandDropdownWrapper?.classList.add("open");
+  elements.brandDropdownMenu?.classList.remove("hidden");
+  elements.brandLogo?.setAttribute("aria-expanded", "true");
+  // Close theme menu if open
+  elements.themeMenu?.classList.add("hidden");
+  elements.themeDropdownWrapper?.classList.remove("open");
+  updateBrandDropdownUser();
+}
+
+function closeBrandDropdown() {
+  elements.brandDropdownWrapper?.classList.remove("open");
+  elements.brandDropdownMenu?.classList.add("hidden");
+  elements.brandLogo?.setAttribute("aria-expanded", "false");
+}
+
+function updateBrandDropdownUser() {
+  const user = state.user || {
+    name: "Forensic Analyst",
+    role: "Identity Specialist",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=User"
+  };
+  if (elements.brandMenuUserName) elements.brandMenuUserName.textContent = user.name || "Forensic User";
+  if (elements.brandMenuUserRole) elements.brandMenuUserRole.textContent = user.role || "ID Checker";
+  if (elements.brandMenuUserAvatar) elements.brandMenuUserAvatar.src = user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.name || 'User')}`;
+}
+
+function handleBrandTabNavigation(tabKey) {
+  // If not logged in, prompt or switch to dashboard
+  if (!state.user && tabKey !== "profile-settings") {
+    showScreen("dashboard");
+  }
+
+  // Update active state in brand tabs list
+  elements.brandTabItems?.forEach(t => {
+    if (t.getAttribute("data-tab") === tabKey) t.classList.add("active");
+    else t.classList.remove("active");
+  });
+
+  switch (tabKey) {
+    case "upload":
+      showScreen("dashboard");
+      switchStudioMode("upload");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      break;
+    case "compare":
+      showScreen("dashboard");
+      switchStudioMode("compare");
+      document.getElementById("panel-compare")?.scrollIntoView({ behavior: "smooth" });
+      break;
+    case "camera":
+      showScreen("dashboard");
+      switchStudioMode("camera");
+      document.getElementById("panel-camera")?.scrollIntoView({ behavior: "smooth" });
+      break;
+    case "audio":
+      showScreen("dashboard");
+      switchStudioMode("audio");
+      document.getElementById("panel-audio")?.scrollIntoView({ behavior: "smooth" });
+      break;
+    case "url":
+      showScreen("dashboard");
+      switchStudioMode("url");
+      document.getElementById("panel-url")?.scrollIntoView({ behavior: "smooth" });
+      break;
+    case "samples":
+      openSamplesModal();
+      break;
+    case "history":
+      showScreen("dashboard");
+      document.getElementById("history-table-body")?.closest(".section-card")?.scrollIntoView({ behavior: "smooth" });
+      break;
+    case "profile-settings":
+      openProfileModal();
+      break;
+    default:
+      showScreen("dashboard");
+      break;
+  }
+}
+
+// ============================================================================
+// PROFILE & ACCOUNT SETTINGS MODAL CONTROLLER
+// ============================================================================
+
+let tempProfileAvatar = null;
+
+function initProfileSettings() {
+  elements.btnHeaderProfileModal?.addEventListener("click", openProfileModal);
+  elements.btnNavSettings?.addEventListener("click", openProfileModal);
+  elements.btnBrandOpenProfile?.addEventListener("click", openProfileModal);
+  elements.btnCloseProfileModal?.addEventListener("click", closeProfileModal);
+  elements.btnCancelProfile?.addEventListener("click", closeProfileModal);
+  
+  elements.modalProfileSettings?.addEventListener("click", (e) => {
+    if (e.target === elements.modalProfileSettings) closeProfileModal();
+  });
+
+  // Profile Picture File Upload Listener
+  elements.profileFileInput?.addEventListener("change", handleProfilePicUpload);
+
+  // Preset Avatars selection
+  elements.avatarPresetBtns?.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const seed = btn.getAttribute("data-seed") || "User";
+      const presetUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+      setProfileAvatarPreview(presetUrl);
+      elements.avatarPresetBtns?.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+
+  // Apply custom URL
+  elements.btnApplyAvatarUrl?.addEventListener("click", () => {
+    const url = elements.profileAvatarUrlInput?.value.trim();
+    if (url) {
+      setProfileAvatarPreview(url);
+      showToast("Avatar URL Applied", "Preview updated. Click 'Save Profile Changes' to apply.", "info", 3000);
+    }
+  });
+
+  // Webcam snapshot for avatar
+  elements.btnAvatarWebcamSnapshot?.addEventListener("click", handleAvatarWebcamSnapshot);
+
+  // Reset Avatar
+  elements.btnAvatarReset?.addEventListener("click", () => {
+    const name = elements.profileInputName?.value.trim() || state.user?.name || "User";
+    const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`;
+    setProfileAvatarPreview(defaultAvatar);
+    showToast("Avatar Reset", "Restored default initials robot avatar.", "info", 3000);
+  });
+
+  // Save Profile Changes Button
+  elements.btnSaveProfile?.addEventListener("click", handleSaveProfile);
+}
+
+function openProfileModal() {
+  const user = state.user || {
+    name: "Mahita",
+    email: "mahita.thundiyil.btech2024@sitpune.edu.in",
+    role: "Lead Identity Specialist",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Mahita",
+    organization: "National Cyber Forensics Lab",
+    badge_id: "IMP-2026-9842",
+    bio: "Lead Inspector - Digital Forensics & Multi-Modal Verification Unit",
+    preferences: {
+      sensitivity: "standard",
+      sound_effects: true,
+      two_factor: true,
+      auto_save_history: true
+    }
+  };
+
+  tempProfileAvatar = user.avatar;
+
+  // Populate inputs
+  if (elements.profileInputName) elements.profileInputName.value = user.name || "";
+  if (elements.profileInputEmail) elements.profileInputEmail.value = user.email || "";
+  if (elements.profileInputRole) elements.profileInputRole.value = user.role || "Lead Identity Specialist";
+  if (elements.profileInputOrg) elements.profileInputOrg.value = user.organization || "";
+  if (elements.profileInputBadge) elements.profileInputBadge.value = user.badge_id || "";
+  if (elements.profileInputBio) elements.profileInputBio.value = user.bio || "";
+  if (elements.profileAvatarUrlInput) elements.profileAvatarUrlInput.value = "";
+
+  // Set avatar preview
+  setProfileAvatarPreview(user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.name || 'User')}`);
+
+  // Populate preferences
+  const prefs = user.preferences || {};
+  if (elements.prefSensitivity) elements.prefSensitivity.value = prefs.sensitivity || "standard";
+  if (elements.prefSoundEffects) elements.prefSoundEffects.checked = prefs.sound_effects !== false;
+  if (elements.pref2fa) elements.pref2fa.checked = prefs.two_factor !== false;
+  if (elements.prefAutoSaveHistory) elements.prefAutoSaveHistory.checked = prefs.auto_save_history !== false;
+
+  elements.modalProfileSettings?.classList.remove("hidden");
+}
+
+function closeProfileModal() {
+  elements.modalProfileSettings?.classList.add("hidden");
+}
+
+function setProfileAvatarPreview(src) {
+  tempProfileAvatar = src;
+  if (elements.profilePreviewAvatar) elements.profilePreviewAvatar.src = src;
+  if (elements.profilePreviewNameLabel) elements.profilePreviewNameLabel.textContent = elements.profileInputName?.value || "Analyst";
+  if (elements.profilePreviewRoleLabel) elements.profilePreviewRoleLabel.textContent = elements.profileInputRole?.value || "Forensic Specialist";
+}
+
+function handleProfilePicUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("Invalid Image File", "Please select a valid image (PNG, JPEG, WebP, GIF).", "warning");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast("Image Too Large", "Please choose a photo under 5MB.", "warning");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    setProfileAvatarPreview(dataUrl);
+    showToast("Photo Loaded", "Avatar preview updated. Click 'Save Profile Changes' to apply.", "success", 3500);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleAvatarWebcamSnapshot() {
+  // If camera stream is active in studio, take snapshot from video feed
+  if (state.cameraStream && elements.cameraVideoFeed && elements.cameraCanvas) {
+    const video = elements.cameraVideoFeed;
+    const canvas = elements.cameraCanvas;
+    canvas.width = 400;
+    canvas.height = 400;
+    const ctx = canvas.getContext("2d");
+    // crop center square
+    const minDim = Math.min(video.videoWidth, video.videoHeight);
+    const startX = (video.videoWidth - minDim) / 2;
+    const startY = (video.videoHeight - minDim) / 2;
+    ctx.drawImage(video, startX, startY, minDim, minDim, 0, 0, 400, 400);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+    setProfileAvatarPreview(dataUrl);
+    showToast("Camera Selfie Snapped", "Avatar photo captured from live webcam feed.", "success", 3000);
+  } else {
+    // Quick camera request for snapshot
+    navigator.mediaDevices?.getUserMedia({ video: { width: 640, height: 640 } })
+      .then(stream => {
+        const tempVideo = document.createElement("video");
+        tempVideo.srcObject = stream;
+        tempVideo.play();
+        tempVideo.onloadedmetadata = () => {
+          setTimeout(() => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 400;
+            canvas.height = 400;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(tempVideo, 0, 0, 400, 400);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+            setProfileAvatarPreview(dataUrl);
+            stream.getTracks().forEach(t => t.stop());
+            showToast("Camera Selfie Snapped", "New profile photo captured successfully!", "success", 3000);
+          }, 350);
+        };
+      })
+      .catch(err => {
+        showToast("Camera Access Required", "Unable to access webcam for profile photo: " + err.message, "warning");
+      });
+  }
+}
+
+async function handleSaveProfile() {
+  const name = elements.profileInputName?.value.trim();
+  const role = elements.profileInputRole?.value.trim();
+  const org = elements.profileInputOrg?.value.trim();
+  const badge = elements.profileInputBadge?.value.trim();
+  const bio = elements.profileInputBio?.value.trim();
+  const sensitivity = elements.prefSensitivity?.value || "standard";
+  const soundEffects = elements.prefSoundEffects?.checked ?? true;
+  const twoFactor = elements.pref2fa?.checked ?? true;
+  const autoSaveHistory = elements.prefAutoSaveHistory?.checked ?? true;
+
+  if (!name) {
+    showToast("Name Required", "Please enter your full name.", "warning");
+    return;
+  }
+
+  const updatedUser = {
+    ...(state.user || {}),
+    id: state.user?.id || "user_demo_001",
+    name: name,
+    email: elements.profileInputEmail?.value.trim() || state.user?.email || "user@impostercheck.ai",
+    role: role || "Forensic Specialist",
+    avatar: tempProfileAvatar || state.user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`,
+    organization: org,
+    badge_id: badge,
+    bio: bio,
+    preferences: {
+      sensitivity,
+      sound_effects: soundEffects,
+      two_factor: twoFactor,
+      auto_save_history: autoSaveHistory
+    }
+  };
+
+  state.user = updatedUser;
+  localStorage.setItem("imposter_user_profile", JSON.stringify(updatedUser));
+
+  // Update UI components immediately
+  if (elements.navUserName) elements.navUserName.textContent = updatedUser.name;
+  if (elements.navUserRole) elements.navUserRole.textContent = updatedUser.role;
+  if (elements.navUserAvatar) elements.navUserAvatar.src = updatedUser.avatar;
+  if (elements.dashUserName) elements.dashUserName.textContent = updatedUser.name;
+  
+  updateBrandDropdownUser();
+
+  // Send to backend API if authenticated
+  if (state.token) {
+    try {
+      await fetch("/api/v1/auth/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${state.token}`
+        },
+        body: JSON.stringify({
+          name: updatedUser.name,
+          role: updatedUser.role,
+          avatar: updatedUser.avatar,
+          bio: updatedUser.bio,
+          organization: updatedUser.organization,
+          badge_id: updatedUser.badge_id,
+          preferences: updatedUser.preferences
+        })
+      });
+    } catch (err) {
+      console.warn("Backend profile sync notice:", err);
+    }
+  }
+
+  closeProfileModal();
+  showToast("Profile Settings Saved", `Profile details & photo updated for ${updatedUser.name}!`, "success", 4000);
 }
 

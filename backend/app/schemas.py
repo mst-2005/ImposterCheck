@@ -27,6 +27,19 @@ class UserProfile(BaseModel):
     email: str
     role: str
     avatar: str
+    bio: Optional[str] = ""
+    organization: Optional[str] = ""
+    badge_id: Optional[str] = ""
+    preferences: Optional[Dict[str, Any]] = None
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    avatar: Optional[str] = None
+    bio: Optional[str] = None
+    organization: Optional[str] = None
+    badge_id: Optional[str] = None
+    preferences: Optional[Dict[str, Any]] = None
 
 class UrlScreenRequest(BaseModel):
     url: str

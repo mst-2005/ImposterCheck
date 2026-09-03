@@ -7,10 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from .schemas import LoginRequest, SignUpRequest, SocialLoginRequest, UrlScreenRequest
+from .schemas import LoginRequest, SignUpRequest, SocialLoginRequest, UrlScreenRequest, ProfileUpdateRequest
 from .auth import (
     signup_user, login_user, social_login, get_current_user_from_token,
-    add_scan_to_history, get_history, clear_history
+    update_user_profile, add_scan_to_history, get_history, clear_history
 )
 from .services import screen_media, screen_url_target, compare_multiple
 
@@ -73,6 +73,32 @@ def handle_get_me(authorization: Optional[str] = Header(None)):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return {"user": user}
+
+@app.post("/api/v1/auth/profile")
+@app.put("/api/v1/auth/profile")
+def handle_update_profile(req: ProfileUpdateRequest, authorization: Optional[str] = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    token = authorization.replace("Bearer ", "").strip()
+    user = get_current_user_from_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    try:
+        updated = update_user_profile(
+            user_id=user["id"],
+            name=req.name,
+            role=req.role,
+            avatar=req.avatar,
+            bio=req.bio,
+            organization=req.organization,
+            badge_id=req.badge_id,
+            preferences=req.preferences
+        )
+        return {"user": updated, "message": "Profile settings successfully saved"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
 
 # ----------------- AUDIT & HISTORY ENDPOINTS -----------------
 
@@ -239,6 +265,11 @@ def get_sample_file(filename: str):
 
 app.mount("/static", StaticFiles(directory=WEB), name="static")
 
+@app.get("/logo.jpeg")
+def logo():
+    return FileResponse(WEB / "logo.jpeg")
+
 @app.get("/")
 def index():
     return FileResponse(WEB / "index.html")
+

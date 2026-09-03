@@ -208,7 +208,53 @@ def get_current_user_from_token(token: str) -> Optional[Dict[str, Any]]:
         "name": user["name"],
         "email": user["email"],
         "role": user.get("role", "Forensic Analyst"),
-        "avatar": user.get("avatar", "")
+        "avatar": user.get("avatar", ""),
+        "bio": user.get("bio", ""),
+        "organization": user.get("organization", ""),
+        "badge_id": user.get("badge_id", ""),
+        "preferences": user.get("preferences", {})
+    }
+
+def update_user_profile(
+    user_id: str,
+    name: Optional[str] = None,
+    role: Optional[str] = None,
+    avatar: Optional[str] = None,
+    bio: Optional[str] = None,
+    organization: Optional[str] = None,
+    badge_id: Optional[str] = None,
+    preferences: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    users = _load_json(USERS_FILE, {})
+    if user_id not in users:
+        raise ValueError("User not found")
+    user = users[user_id]
+    if name and name.strip():
+        user["name"] = name.strip()
+    if role and role.strip():
+        user["role"] = role.strip()
+    if avatar is not None:
+        user["avatar"] = avatar
+    if bio is not None:
+        user["bio"] = bio
+    if organization is not None:
+        user["organization"] = organization
+    if badge_id is not None:
+        user["badge_id"] = badge_id
+    if preferences is not None:
+        user["preferences"] = preferences
+    users[user_id] = user
+    _save_json(USERS_FILE, users)
+    return {
+        "id": user["id"],
+        "name": user["name"],
+        "email": user["email"],
+        "role": user.get("role", "Forensic Analyst"),
+        "avatar": user.get("avatar", ""),
+        "bio": user.get("bio", ""),
+        "organization": user.get("organization", ""),
+        "badge_id": user.get("badge_id", ""),
+        "preferences": user.get("preferences", {})
     }
 
 def add_scan_to_history(user_id: Optional[str], scan_result: Dict[str, Any]) -> None:

@@ -22,13 +22,134 @@
   <!-- Top Navigation Header -->
   <header class="app-header">
     <div class="header-container">
-      <div class="brand" id="brand-logo" title="Back to Home">
-        <div class="brand-icon">
-          <img src="/logo.jpeg" alt="The Imposter Check Logo" class="brand-logo-img">
-        </div>
-        <div class="brand-text">
-          <span class="brand-title">THE IMPOSTER CHECK</span>
-          <span class="brand-tag">EASY FAKE ID & DEEPFAKE DETECTOR</span>
+      <!-- Brand Logo Menu Toggle Button & Dropdown -->
+      <div class="brand-dropdown-wrapper" id="brand-dropdown-wrapper">
+        <button type="button" class="brand brand-menu-btn" id="brand-logo" aria-label="Open Navigation & Tools Menu" aria-expanded="false" title="Click for Navigation & Tools">
+          <div class="brand-icon">
+            <img src="/logo.jpeg" alt="The Imposter Check Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">THE IMPOSTER CHECK</span>
+            <span class="brand-tag">EASY FAKE ID & DEEPFAKE DETECTOR</span>
+          </div>
+          <div class="brand-chevron-badge">
+            <span class="brand-menu-label">TABS</span>
+            <svg class="chevron-icon brand-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Brand Dropdown Tabs Menu -->
+        <div class="brand-dropdown-menu hidden" id="brand-dropdown-menu">
+          <div class="brand-dropdown-header">
+            <div class="brand-header-badge">
+              <span class="badge-dot"></span>
+              <span>FORENSIC TOOLS & TABS</span>
+            </div>
+            <span class="brand-header-subtitle">Switch scanner mode, view logs, or customize profile</span>
+          </div>
+
+          <div class="brand-tabs-list">
+            <div class="brand-tabs-group-label">Inspection Studios</div>
+
+            <!-- Tab 1: Single File Scan -->
+            <button type="button" class="brand-tab-item active" data-tab="upload">
+              <span class="brand-tab-icon">🪪</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Scan Studio (Upload)</span>
+                <span class="brand-tab-desc">Single ID card photo, video, PDF, or audio file</span>
+              </div>
+              <span class="brand-tab-tag">Studio</span>
+            </button>
+
+            <!-- Tab 2: Multi-File Compare -->
+            <button type="button" class="brand-tab-item" data-tab="compare">
+              <span class="brand-tab-icon">⚖️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Multi-File Compare</span>
+                <span class="brand-tab-desc">Cross-identity match & discrepancy matrix</span>
+              </div>
+              <span class="brand-tab-tag">Compare</span>
+            </button>
+
+            <!-- Tab 3: Live Camera -->
+            <button type="button" class="brand-tab-item" data-tab="camera">
+              <span class="brand-tab-icon">🎥</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Live WebRTC Camera</span>
+                <span class="brand-tab-desc">Real-time webcam snapshot & liveness motion test</span>
+              </div>
+              <span class="brand-tab-tag">Live</span>
+            </button>
+
+            <!-- Tab 4: Audio Forensics -->
+            <button type="button" class="brand-tab-item" data-tab="audio">
+              <span class="brand-tab-icon">🎙️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Voice & Audio Deepfake</span>
+                <span class="brand-tab-desc">Live microphone capture & spectral frequency analyzer</span>
+              </div>
+              <span class="brand-tab-tag">Voice</span>
+            </button>
+
+            <!-- Tab 5: URL Checker -->
+            <button type="button" class="brand-tab-item" data-tab="url">
+              <span class="brand-tab-icon">🔗</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Remote Web URL Scanner</span>
+                <span class="brand-tab-desc">Download & inspect remote links and online media</span>
+              </div>
+              <span class="brand-tab-tag">Web</span>
+            </button>
+
+            <div class="brand-tabs-group-label">Forensic Resources & History</div>
+
+            <!-- Tab 6: Preloaded Samples -->
+            <button type="button" class="brand-tab-item" data-tab="samples">
+              <span class="brand-tab-icon">🧪</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Pre-Loaded Test Samples</span>
+                <span class="brand-tab-desc">12 genuine vs imposter test cases library</span>
+              </div>
+              <span class="brand-tab-tag highlight">Samples</span>
+            </button>
+
+            <!-- Tab 7: History Logs -->
+            <button type="button" class="brand-tab-item" data-tab="history">
+              <span class="brand-tab-icon">📜</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Audit History & Logs</span>
+                <span class="brand-tab-desc">Review previous scan verdicts & forensic scores</span>
+              </div>
+              <span class="brand-tab-tag">Audit</span>
+            </button>
+
+            <div class="brand-tabs-group-label">Account & Configuration</div>
+
+            <!-- Tab 8: Profile Settings (Requested!) -->
+            <button type="button" class="brand-tab-item brand-tab-settings" data-tab="profile-settings" id="btn-brand-open-profile">
+              <span class="brand-tab-icon">⚙️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Profile Settings</span>
+                <span class="brand-tab-desc">Edit profile picture, name, role, badge & preferences</span>
+              </div>
+              <span class="brand-tab-tag pulse">Settings</span>
+            </button>
+          </div>
+
+          <div class="brand-dropdown-footer">
+            <div class="brand-footer-user" id="brand-menu-user-info">
+              <img id="brand-menu-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Avatar" class="mini-avatar">
+              <div class="brand-footer-text">
+                <span id="brand-menu-user-name" class="brand-user-name">Forensic User</span>
+                <span id="brand-menu-user-role" class="brand-user-role">ID Checker</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline btn-xs" id="brand-menu-btn-profile" title="Open Profile">
+              <span>Edit Profile</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -130,12 +251,20 @@
         </div>
 
         <!-- Logged In profile badge -->
-        <div id="nav-user-profile" class="user-profile-badge hidden">
-          <img id="nav-user-avatar" src="" alt="Avatar" class="user-avatar">
-          <div class="user-info-text">
-            <span id="nav-user-name" class="user-name">User</span>
-            <span id="nav-user-role" class="user-role">ID Checker</span>
+        <div id="nav-user-profile" class="user-profile-badge hidden" title="Account & Settings">
+          <div class="user-badge-clickable" id="btn-header-profile-modal" title="Click to edit Profile & Picture">
+            <img id="nav-user-avatar" src="" alt="Avatar" class="user-avatar">
+            <div class="user-info-text">
+              <span id="nav-user-name" class="user-name">User</span>
+              <span id="nav-user-role" class="user-role">ID Checker</span>
+            </div>
           </div>
+          <button type="button" class="btn-icon" id="btn-nav-settings" title="Profile Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
           <button type="button" class="btn-icon" id="btn-logout" title="Sign Out">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -828,6 +957,237 @@
       </div>
     </section>
 
+  <!-- ==============================================
+       PROFILE & ACCOUNT SETTINGS MODAL
+       ============================================== -->
+  <div id="modal-profile-settings" class="modal-overlay hidden">
+    <div class="profile-settings-card">
+      <!-- Modal Header -->
+      <div class="profile-modal-header">
+        <div class="profile-modal-title-wrap">
+          <div class="profile-modal-icon-badge">⚙️</div>
+          <div>
+            <h2 class="profile-modal-title">Profile & Identity Settings</h2>
+            <p class="profile-modal-subtitle">Customize your forensic analyst credentials, profile picture, and scanner preferences.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-icon btn-close-modal" id="btn-close-profile-modal" title="Close Settings">✕</button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="profile-modal-body">
+        <form id="form-profile-settings" onsubmit="return false;">
+          
+          <!-- SECTION 1: PROFILE PICTURE & AVATAR -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">1</span>
+              <div>
+                <h3 class="section-card-title">Profile Picture & Avatar</h3>
+                <p class="section-card-subtitle">Upload your own photo, take a webcam selfie, or pick an avatar preset.</p>
+              </div>
+            </div>
+
+            <div class="avatar-management-grid">
+              <!-- Avatar Preview Column -->
+              <div class="avatar-preview-box">
+                <div class="avatar-halo-wrapper">
+                  <img id="profile-preview-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Profile Picture" class="profile-large-avatar">
+                  <div class="avatar-status-badge" title="Active Account">🟢</div>
+                </div>
+                <div class="avatar-preview-meta">
+                  <span id="profile-preview-name-label" class="avatar-meta-name">Analyst</span>
+                  <span id="profile-preview-role-label" class="avatar-meta-role">Forensic Specialist</span>
+                </div>
+              </div>
+
+              <!-- Avatar Action Controls Column -->
+              <div class="avatar-action-controls">
+                <!-- Option A: File Upload & Camera -->
+                <div class="avatar-upload-row">
+                  <label for="profile-file-input" class="btn btn-primary btn-sm btn-upload-avatar" title="Choose file from computer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>📁 Upload Picture</span>
+                  </label>
+                  <input type="file" id="profile-file-input" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" class="hidden">
+
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-avatar-webcam-snapshot" title="Snap live avatar photo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                    <span>📸 Snap with Camera</span>
+                  </button>
+
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-avatar-reset" title="Reset to Default Avatar">
+                    <span>↺ Reset</span>
+                  </button>
+                </div>
+
+                <!-- Option B: Presets Selector -->
+                <div class="avatar-presets-wrapper">
+                  <label class="preset-label">Or choose an avatar preset:</label>
+                  <div class="avatar-presets-list">
+                    <button type="button" class="avatar-preset-btn" data-seed="Mahita" title="Lead Analyst Mahita">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Mahita" alt="Mahita">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="CyberDetective" title="Cyber Detective">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=CyberDetective" alt="Detective">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="SecurityGuardian" title="Security Guardian">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SecurityGuardian" alt="Guardian">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="ForensicLead" title="Forensic Scientist">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ForensicLead" alt="Forensic">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="AIAuditor" title="AI Neural Auditor">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=AIAuditor" alt="Auditor">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="FederalAgent" title="Federal Agent">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=FederalAgent" alt="Agent">
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Option C: Custom Image URL -->
+                <div class="form-group-inline">
+                  <label for="profile-avatar-url-input">Or enter Avatar Image URL:</label>
+                  <div class="avatar-url-input-group">
+                    <input type="url" id="profile-avatar-url-input" class="form-control form-control-sm" placeholder="https://example.com/my-photo.jpg">
+                    <button type="button" class="btn btn-outline btn-xs" id="btn-apply-avatar-url">Apply URL</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: PERSONAL & PROFESSIONAL IDENTITY -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">2</span>
+              <div>
+                <h3 class="section-card-title">Analyst Identity & Organization</h3>
+                <p class="section-card-subtitle">Information displayed on generated forensic reports and logs.</p>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="profile-input-name">Full Name <span class="required">*</span></label>
+                <input type="text" id="profile-input-name" class="form-control" placeholder="e.g. Mahita Thundiyil" required>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-email">Email Address <span class="verified-tag">✓ Verified</span></label>
+                <input type="email" id="profile-input-email" class="form-control" placeholder="user@domain.com" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-role">Designation / Role</label>
+                <select id="profile-input-role" class="form-control">
+                  <option value="Lead Identity Specialist">Lead Identity Specialist</option>
+                  <option value="Forensic Document Analyst">Forensic Document Analyst</option>
+                  <option value="Cybersecurity Investigator">Cybersecurity Investigator</option>
+                  <option value="Border & Law Enforcement Officer">Border & Law Enforcement Officer</option>
+                  <option value="Anti-Fraud Risk Specialist">Anti-Fraud Risk Specialist</option>
+                  <option value="Compliance & KYC Auditor">Compliance & KYC Auditor</option>
+                  <option value="Security Operations Analyst">Security Operations Analyst</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-org">Agency / Organization</label>
+                <input type="text" id="profile-input-org" class="form-control" placeholder="e.g. National Cyber Forensics Lab">
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-badge">Inspector Badge ID</label>
+                <input type="text" id="profile-input-badge" class="form-control" placeholder="e.g. IMP-2026-9842">
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-bio">Department Bio / Notes</label>
+                <input type="text" id="profile-input-bio" class="form-control" placeholder="e.g. Digital Media Forensics & Biometric Unit">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: SCANNER & SECURITY PREFERENCES -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">3</span>
+              <div>
+                <h3 class="section-card-title">Scanner & Security Preferences</h3>
+                <p class="section-card-subtitle">Configure detection sensitivity, notifications, and security protocols.</p>
+              </div>
+            </div>
+
+            <div class="preferences-grid">
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🔬 Deepfake Sensitivity</span>
+                  <span class="pref-desc">Detection confidence strictness for AI face & document edits.</span>
+                </div>
+                <select id="pref-sensitivity" class="form-control form-control-sm pref-select">
+                  <option value="strict">Strict (99% Threshold)</option>
+                  <option value="standard" selected>Standard Balanced (90%)</option>
+                  <option value="fast">Fast Screen (80%)</option>
+                </select>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🔊 Sound Alerts</span>
+                  <span class="pref-desc">Play audio feedback tones upon scan completion.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-sound-effects" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🛡️ 2-Factor Authentication (2FA)</span>
+                  <span class="pref-desc">Require biometric or security code on login.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-2fa" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">📊 Auto-Save Scan History</span>
+                  <span class="pref-desc">Keep record of all screened documents in audit log.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-auto-save-history" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="profile-modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-cancel-profile">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-save-profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>💾 Save Profile Changes</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Simple Loading Screen -->
