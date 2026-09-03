@@ -104,6 +104,11 @@ async def screen_document(
         filename = file.filename or "uploaded_media"
         content_type = file.content_type or ""
         
+        if len(raw) == 0:
+            raise HTTPException(status_code=400, detail="The selected file is empty (0 bytes). Please select a valid document or media file.")
+        if len(raw) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File size exceeds the 50MB limit. Please upload a smaller file.")
+
         result = screen_media(raw, filename, content_type, reference)
         
         # Save to user history
@@ -116,8 +121,12 @@ async def screen_document(
         add_scan_to_history(user_id, result)
         
         return result
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Document screening error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Document screening error: {str(e)}")
 
 @app.post("/api/v1/screen-url")
 async def screen_url(
@@ -125,7 +134,11 @@ async def screen_url(
     authorization: Optional[str] = Header(None)
 ):
     try:
-        result = screen_url_target(req.url, req.reference or "")
+        url_clean = (req.url or "").strip()
+        if not url_clean.startswith("http://") and not url_clean.startswith("https://"):
+            raise HTTPException(status_code=400, detail="Invalid URL format. Please provide a complete URL starting with https:// or http://")
+            
+        result = screen_url_target(url_clean, req.reference or "")
         
         user_id = None
         if authorization:
@@ -136,8 +149,12 @@ async def screen_url(
         add_scan_to_history(user_id, result)
         
         return result
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"URL inspection failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"URL inspection failed: {str(e)}")
 
 @app.post("/api/v1/compare")
 async def compare_documents(
@@ -147,12 +164,14 @@ async def compare_documents(
 ):
     try:
         if len(files) < 2:
-            raise HTTPException(status_code=400, detail="Please upload at least 2 files to compare.")
+            raise HTTPException(status_code=400, detail="At least 2 files (e.g. ID card and selfie) are required for cross-identity comparison.")
             
         files_data = []
-        for f in files:
+        for idx, f in enumerate(files):
             raw = await f.read()
-            files_data.append((raw, f.filename or "file", f.content_type or ""))
+            if len(raw) == 0:
+                raise HTTPException(status_code=400, detail=f"File #{idx+1} ('{f.filename}') is empty (0 bytes).")
+            files_data.append((raw, f.filename or f"file_{idx+1}", f.content_type or ""))
             
         result = compare_multiple(files_data, reference)
         
@@ -167,8 +186,10 @@ async def compare_documents(
         return result
     except HTTPException:
         raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Cross-comparison error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Multi-file comparison error: {str(e)}")
 
 # ----------------- SAMPLE DEMO FILES ENDPOINTS -----------------
 

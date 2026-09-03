@@ -75,11 +75,20 @@ _ensure_initial_users()
 
 
 def signup_user(name: str, email: str, password: str, role: str = "Forensic Analyst") -> Dict[str, Any]:
+    if not name or len(name.strip()) < 2:
+        raise ValueError("Please provide a valid full name (at least 2 characters).")
+    
+    email_clean = (email or "").strip().lower()
+    if not email_clean or "@" not in email_clean or "." not in email_clean:
+        raise ValueError("Please enter a valid email address (e.g. user@domain.com).")
+        
+    if not password or len(password) < 6:
+        raise ValueError("Password is too short. It must be at least 6 characters long.")
+
     users = _load_json(USERS_FILE, {})
-    email_clean = email.strip().lower()
     for uid, u in users.items():
         if u.get("email", "").lower() == email_clean:
-            raise ValueError("An account with this email address already exists.")
+            raise ValueError(f"An account with email '{email_clean}' is already registered. Please sign in or use another email.")
     
     user_id = f"user_{uuid.uuid4().hex[:10]}"
     avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={name.replace(' ', '')}"
@@ -109,8 +118,13 @@ def signup_user(name: str, email: str, password: str, role: str = "Forensic Anal
     }
 
 def login_user(email: str, password: str) -> Dict[str, Any]:
+    email_clean = (email or "").strip().lower()
+    if not email_clean or "@" not in email_clean:
+        raise ValueError("Please provide a valid registered email address.")
+    if not password:
+        raise ValueError("Please enter your account password.")
+
     users = _load_json(USERS_FILE, {})
-    email_clean = email.strip().lower()
     target_user = None
     for uid, u in users.items():
         if u.get("email", "").lower() == email_clean:
@@ -118,11 +132,11 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
             break
             
     if not target_user:
-        raise ValueError("Invalid email or password.")
+        raise ValueError(f"No account found with email '{email_clean}'. Please verify your spelling or click 'Create Free Account'.")
         
     pwd_hash = _hash_password(password)
     if target_user.get("password_hash") != pwd_hash:
-        raise ValueError("Invalid email or password.")
+        raise ValueError("Incorrect password. Please verify your credentials and try again.")
         
     token = _generate_token(target_user["id"], target_user["email"])
     return {

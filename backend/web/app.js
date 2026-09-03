@@ -447,10 +447,60 @@ async function checkCurrentUserSession() {
   }
 }
 
+function showToast(title, message, type = "error", duration = 5000) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const icons = {
+    error: "❌",
+    warning: "⚠️",
+    success: "✅",
+    info: "ℹ️"
+  };
+
+  const toast = document.createElement("div");
+  toast.className = `toast-item toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon-wrap">${icons[type] || "ℹ️"}</div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button type="button" class="toast-close-btn" aria-label="Dismiss">&times;</button>
+  `;
+
+  const closeBtn = toast.querySelector(".toast-close-btn");
+  const dismiss = () => {
+    toast.classList.add("toast-leaving");
+    setTimeout(() => {
+      if (toast.parentNode === container) container.removeChild(toast);
+    }, 300);
+  };
+
+  closeBtn.addEventListener("click", dismiss);
+  container.appendChild(toast);
+
+  if (duration > 0) {
+    setTimeout(dismiss, duration);
+  }
+}
+
 async function handleLoginSubmit(e) {
   e.preventDefault();
   const email = elements.loginEmail.value.trim();
   const password = elements.loginPassword.value;
+
+  if (!email) {
+    showToast("Missing Email", "Please enter your registered email address.", "warning");
+    showAuthAlert("Please enter your registered email address.", "warning");
+    return;
+  }
+  if (!password) {
+    showToast("Missing Password", "Please enter your account password.", "warning");
+    showAuthAlert("Please enter your account password.", "warning");
+    return;
+  }
+
   showLoading("Authenticating Forensic Credentials...");
 
   try {
@@ -463,13 +513,18 @@ async function handleLoginSubmit(e) {
     hideLoading();
 
     if (!res.ok) {
-      showAuthAlert(data.detail || "Authentication failed", "error");
+      const msg = data.detail || "Authentication failed. Please verify credentials.";
+      showAuthAlert(msg, "error");
+      showToast("Sign In Failed", msg, "error");
       return;
     }
+    showToast("Welcome Back!", `Successfully signed in as ${data.user.name}.`, "success", 3000);
     onAuthSuccess(data.user, data.token);
   } catch (err) {
     hideLoading();
-    showAuthAlert("Server connection error: " + err.message, "error");
+    const netMsg = "Could not reach forensic server: " + err.message;
+    showAuthAlert(netMsg, "error");
+    showToast("Connection Error", netMsg, "error");
   }
 }
 
@@ -479,6 +534,26 @@ async function handleSignupSubmit(e) {
   const email = elements.signupEmail.value.trim();
   const role = elements.signupRole.value;
   const password = elements.signupPassword.value;
+
+  if (!name || name.length < 2) {
+    const msg = "Please enter your full name (minimum 2 characters).";
+    showToast("Invalid Name", msg, "warning");
+    showAuthAlert(msg, "warning");
+    return;
+  }
+  if (!email || !email.includes("@") || !email.includes(".")) {
+    const msg = "Please enter a valid email address (e.g. name@domain.com).";
+    showToast("Invalid Email", msg, "warning");
+    showAuthAlert(msg, "warning");
+    return;
+  }
+  if (!password || password.length < 6) {
+    const msg = "Password must be at least 6 characters long.";
+    showToast("Short Password", msg, "warning");
+    showAuthAlert(msg, "warning");
+    return;
+  }
+
   showLoading("Registering Forensic Account...");
 
   try {
@@ -491,13 +566,18 @@ async function handleSignupSubmit(e) {
     hideLoading();
 
     if (!res.ok) {
-      showAuthAlert(data.detail || "Registration failed", "error");
+      const msg = data.detail || "Registration failed. Please check your information.";
+      showAuthAlert(msg, "error");
+      showToast("Registration Failed", msg, "error");
       return;
     }
+    showToast("Account Created", `Welcome, ${data.user.name}! Your account is ready.`, "success", 3000);
     onAuthSuccess(data.user, data.token);
   } catch (err) {
     hideLoading();
-    showAuthAlert("Server connection error: " + err.message, "error");
+    const netMsg = "Server connection error: " + err.message;
+    showAuthAlert(netMsg, "error");
+    showToast("Connection Error", netMsg, "error");
   }
 }
 
@@ -574,7 +654,7 @@ async function handleSocialPopupSubmit(e) {
   const password = elements.socialAuthPassword.value;
 
   if (!email || !password) {
-    alert("Please enter both username/email and password to authenticate.");
+    showToast("Missing Credentials", "Please enter both your username/email and password.", "warning");
     return;
   }
 
@@ -594,12 +674,15 @@ async function handleSocialPopupSubmit(e) {
     const data = await res.json();
     hideLoading();
     if (res.ok) {
+      showToast("Social Login Verified", `Signed in via ${currentSocialProvider.toUpperCase()} as ${data.user.name}.`, "success", 3000);
       onAuthSuccess(data.user, data.token);
     } else {
+      showToast("Social Sign In Failed", data.detail || "Authentication was rejected.", "error");
       showAuthAlert(data.detail || "Social authentication failed", "error");
     }
   } catch (err) {
     hideLoading();
+    showToast("Social Sign In Error", err.message, "error");
     showAuthAlert("Social authentication error: " + err.message, "error");
   }
 }
@@ -677,7 +760,7 @@ function setupSingleDropZone() {
   elements.formUploadMedia?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!state.selectedSingleFile) {
-      alert("Please choose or drag & drop a file to screen.");
+      showToast("No File Selected", "Please choose or drag & drop an identity document, photo, video, or audio file to screen.", "warning");
       return;
     }
     await executeSingleScreening(state.selectedSingleFile, elements.referenceText.value.trim());
@@ -716,13 +799,14 @@ async function executeSingleScreening(file, reference = "") {
     hideLoading();
 
     if (!res.ok) {
-      alert(data.detail || "Screening error occurred");
+      const msg = data.detail || "Unable to complete document screening.";
+      showToast("Screening Error", msg, "error");
       return;
     }
     renderScreenResults(data);
   } catch (err) {
     hideLoading();
-    alert("Network or processing error: " + err.message);
+    showToast("Network Error", "Failed to connect to backend server: " + err.message, "error");
   }
 }
 
@@ -744,8 +828,15 @@ async function toggleCameraFeed() {
       elements.btnStartCamera.innerHTML = `<span>Stop WebRTC Camera</span>`;
       elements.btnCapturePhoto.disabled = false;
       elements.btnRecordLivenessVideo.disabled = false;
+      showToast("Camera Connected", "Live video feed active. Ready to capture photo or record liveness video.", "info", 3000);
     } catch (err) {
-      alert("Camera access denied or unavailable: " + err.message);
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        showToast("Camera Permission Denied", "Please allow camera permissions in your browser address bar to use the Live Camera studio.", "error");
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        showToast("No Camera Detected", "No webcam was found connected to your system.", "error");
+      } else {
+        showToast("Camera Error", "Could not start camera feed: " + err.message, "error");
+      }
     }
   }
 }
@@ -762,7 +853,10 @@ function stopCameraFeed() {
 }
 
 function captureCameraPhoto() {
-  if (!state.cameraStream) return;
+  if (!state.cameraStream) {
+    showToast("Camera Inactive", "Please click 'Start WebRTC Camera' first.", "warning");
+    return;
+  }
   const video = elements.cameraVideoFeed;
   const canvas = elements.cameraCanvas;
   canvas.width = video.videoWidth || 640;
@@ -774,11 +868,15 @@ function captureCameraPhoto() {
     state.capturedMediaBlob = new File([blob], "live_photo_capture.jpg", { type: "image/jpeg" });
     elements.cameraCapturedImg.src = URL.createObjectURL(blob);
     elements.cameraSnapshotPreview.classList.remove("hidden");
+    showToast("Photo Captured", "Snapshot ready. Click 'Scan Live Capture' to screen for impersonation.", "success", 3000);
   }, "image/jpeg", 0.92);
 }
 
 function recordLivenessVideo() {
-  if (!state.cameraStream) return;
+  if (!state.cameraStream) {
+    showToast("Camera Inactive", "Please click 'Start WebRTC Camera' first.", "warning");
+    return;
+  }
   elements.btnRecordLivenessVideo.disabled = true;
   elements.recordingIndicator.classList.remove("hidden");
 
@@ -807,6 +905,7 @@ function recordLivenessVideo() {
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     elements.cameraCapturedImg.src = canvas.toDataURL("image/jpeg");
     elements.cameraSnapshotPreview.classList.remove("hidden");
+    showToast("Liveness Video Recorded", "5-second video captured. Click 'Scan Live Capture' to run forensic check.", "success", 3000);
   };
 
   recorder.start();
@@ -814,7 +913,10 @@ function recordLivenessVideo() {
 }
 
 async function screenCapturedMedia() {
-  if (!state.capturedMediaBlob) return;
+  if (!state.capturedMediaBlob) {
+    showToast("No Media Captured", "Please snap a photo or record a 5-second video first.", "warning");
+    return;
+  }
   await executeSingleScreening(state.capturedMediaBlob, "LIVE_CAMERA_CAPTURE");
 }
 
@@ -849,13 +951,20 @@ async function toggleAudioRecording() {
         elements.audioPlayback.src = URL.createObjectURL(blob);
         elements.audioPlayback.classList.remove("hidden");
         elements.btnScreenAudioSample.classList.remove("hidden");
+        showToast("Voice Sample Ready", "Voice recording saved. Click 'Screen Voice Sample' to detect synthetic speech.", "success", 3000);
       };
 
       state.mediaRecorder.start();
       elements.recordAudioLabel.textContent = "Stop Voice Recording";
       elements.audioStudioStatus.textContent = "🔴 Recording Voice Biometrics... Speak clearly into microphone";
     } catch (err) {
-      alert("Microphone access denied: " + err.message);
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        showToast("Microphone Permission Denied", "Please grant microphone permissions in browser settings to record voice samples.", "error");
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        showToast("No Microphone Found", "No audio input device was found connected to your system.", "error");
+      } else {
+        showToast("Microphone Error", "Could not start audio recording: " + err.message, "error");
+      }
     }
   }
 }
@@ -908,7 +1017,10 @@ function startWaveformVisualization() {
 }
 
 async function screenRecordedAudio() {
-  if (!state.recordedAudioBlob) return;
+  if (!state.recordedAudioBlob) {
+    showToast("No Voice Sample", "Please record your voice before screening for deepfake speech.", "warning");
+    return;
+  }
   await executeSingleScreening(state.recordedAudioBlob, "VOICE_SAMPLE");
 }
 
@@ -920,6 +1032,12 @@ async function handleUrlScreenSubmit(e) {
   e.preventDefault();
   const url = elements.inputTargetUrl.value.trim();
   const reference = elements.inputUrlReference.value.trim();
+
+  if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+    showToast("Invalid URL Format", "Please enter a valid website or image link starting with https:// or http://", "warning");
+    return;
+  }
+
   showLoading("Fetching & Inspecting Remote Web Asset...");
 
   try {
@@ -935,13 +1053,14 @@ async function handleUrlScreenSubmit(e) {
     hideLoading();
 
     if (!res.ok) {
-      alert(data.detail || "URL Screening failed");
+      const msg = data.detail || "URL inspection failed. Please verify that the target URL is accessible and returns a valid media asset.";
+      showToast("URL Scan Failed", msg, "error");
       return;
     }
     renderScreenResults(data);
   } catch (err) {
     hideLoading();
-    alert("URL screening network error: " + err.message);
+    showToast("Network Error", "Could not connect to URL screening endpoint: " + err.message, "error");
   }
 }
 
@@ -1026,7 +1145,7 @@ function renderMultiFileQueue() {
 async function handleMultiCompareSubmit(e) {
   e.preventDefault();
   if (state.multiFilesQueue.length < 2) {
-    alert("Please select at least 2 files to compare identities.");
+    showToast("Insufficient Files", "Cross-comparison requires at least 2 files (e.g. passport and selfie photo). Please add more files.", "warning");
     return;
   }
 
@@ -1045,13 +1164,14 @@ async function handleMultiCompareSubmit(e) {
     hideLoading();
 
     if (!res.ok) {
-      alert(data.detail || "Cross-comparison error occurred");
+      const msg = data.detail || "Cross-comparison failed. Please verify the uploaded files.";
+      showToast("Comparison Failed", msg, "error");
       return;
     }
     renderCompareResults(data);
   } catch (err) {
     hideLoading();
-    alert("Cross comparison request error: " + err.message);
+    showToast("Network Error", "Multi-file comparison request error: " + err.message, "error");
   }
 }
 

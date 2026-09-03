@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Imposter Check | Easy Real vs Fake Identity Detector</title>
+  <link rel="icon" type="image/jpeg" href="/logo.jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,15 +16,15 @@
   <div class="ambient-glow glow-2"></div>
   <div class="ambient-glow glow-3"></div>
 
+  <!-- Floating Toast Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
   <!-- Top Navigation Header -->
   <header class="app-header">
     <div class="header-container">
       <div class="brand" id="brand-logo" title="Back to Home">
         <div class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
+          <img src="/logo.jpeg" alt="The Imposter Check Logo" class="brand-logo-img">
         </div>
         <div class="brand-text">
           <span class="brand-title">THE IMPOSTER CHECK</span>
@@ -156,11 +157,14 @@
         <div class="auth-card">
           <!-- Auth Header -->
           <div class="auth-header">
-            <div class="auth-badge">
-              <span>🔒 SECURE ACCESS</span>
+            <div class="auth-brand-emblem">
+              <img src="/logo.jpeg" alt="The Imposter Check Emblem" class="auth-brand-logo-img">
             </div>
-            <h1 class="auth-title">Welcome to The Imposter Check</h1>
-            <p class="auth-subtitle">Easily check if identity cards, photos, videos, voices, or documents are Real or Fake.</p>
+            <div class="auth-badge">
+              <span>🔒 SECURE IDENTITY ACCESS</span>
+            </div>
+            <h1 class="auth-title">The Imposter Check</h1>
+            <p class="auth-subtitle">Real vs Fake Identity Verification & Deepfake Forensics Platform.</p>
           </div>
 
           <!-- Fast 1-Click Demo Access Button -->
