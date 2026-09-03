@@ -313,19 +313,21 @@ generate_test_video("10_slowmo_test_video.mp4", mode="slowmo", fps=60.0, n_frame
 # -------------------------------------------------------------
 # 7. MULTI-FILE CROSS-IDENTITY COMPARISON TEST SETS
 # -------------------------------------------------------------
+def make_clean_selfie(is_alternate=False, text_label=""):
+    w, h = 500, 500
+    canvas = np.full((h, w, 3), (225, 230, 235), dtype=np.uint8)
+    face = draw_synthetic_face(340, 420, is_alternate=is_alternate)
+    canvas[40:460, 80:420] = face
+    color = (16, 185, 129) if not is_alternate else (239, 68, 68)
+    cv2.putText(canvas, text_label, (25, 485), cv2.FONT_HERSHEY_SIMPLEX, 0.50, color, 1)
+    return canvas
+
 # Matching Set: Mahita ID + Mahita Selfie
-selfie_match = np.full((500, 500, 3), (30, 35, 45), dtype=np.uint8)
-face_match = draw_synthetic_face(260, 320, is_alternate=False)
-selfie_match[90:410, 120:380] = face_match
-cv2.putText(selfie_match, "SELFIE: MAHITA (GENUINE MATCH)", (30, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (16, 185, 129), 2)
+selfie_match = make_clean_selfie(is_alternate=False, text_label="SELFIE: MAHITA (GENUINE MATCH)")
 cv2.imwrite(str(OUT_DIR / "11_match_mahita_selfie.png"), selfie_match)
 
-
 # Imposter / Fake Set: Imposter Selfie with completely DIFFERENT Face
-selfie_imposter = np.full((500, 500, 3), (30, 35, 45), dtype=np.uint8)
-face_imposter = draw_synthetic_face(260, 320, is_alternate=True) # Alternate face features
-selfie_imposter[90:410, 120:380] = face_imposter
-cv2.putText(selfie_imposter, "IMPOSTER: DIFFERENT FACE SUBJECT", (30, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (239, 68, 68), 2)
+selfie_imposter = make_clean_selfie(is_alternate=True, text_label="IMPOSTER: DIFFERENT FACE SUBJECT")
 cv2.imwrite(str(OUT_DIR / "12_imposter_mismatch_selfie.png"), selfie_imposter)
 
 print(f"\nSuccessfully generated all sample input files in {OUT_DIR}!")

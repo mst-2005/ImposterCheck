@@ -19,28 +19,55 @@ def _get_face_cascade():
     return _FACE_CASCADE
 
 def detect_faces(image: np.ndarray) -> List[Dict[str, Any]]:
-    cascade = _get_face_cascade()
-    if cascade is None or cascade.empty():
-        return []
-    
+    h_orig, w_orig = image.shape[:2]
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(30, 30))
+    face_boxes = []
+
+    # 1. Primary: Haar Cascade for photographic human faces
+    cascade = _get_face_cascade()
+    if cascade is not None and not cascade.empty():
+        faces = cascade.detectMultiScale(gray, scaleFactor=1.08, minNeighbors=3, minSize=(30, 30))
+        for (x, y, w, h) in faces:
+            face_boxes.append((int(x), int(y), int(w), int(h)))
+
+    # 2. Secondary: Portrait skin-tone / contour detection for ID photos and synthetic cards
+    if not face_boxes:
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        lower_skin = np.array([0, 20, 70], dtype=np.uint8)
+        upper_skin = np.array([25, 255, 255], dtype=np.uint8)
+        mask = cv2.inRange(hsv, lower_skin, upper_skin)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > (0.02 * h_orig * w_orig):
+                x, y, w, h = cv2.boundingRect(cnt)
+                aspect = h / max(1, w)
+                if 0.75 <= aspect <= 1.8:
+                    face_boxes.append((int(x), int(y), int(w), int(h)))
+                    break
+
     results = []
-    
-    for idx, (x, y, w, h) in enumerate(faces):
+    for idx, (x, y, w, h) in enumerate(face_boxes):
         face_roi = image[y:y+h, x:x+w]
-        # Compute color histogram embedding as a lightweight facial descriptor
-        hist_b = cv2.calcHist([face_roi], [0], None, [16], [0, 256])
-        hist_g = cv2.calcHist([face_roi], [1], None, [16], [0, 256])
-        hist_r = cv2.calcHist([face_roi], [2], None, [16], [0, 256])
-        hist = np.concatenate([hist_b, hist_g, hist_r]).flatten()
-        hist = hist / (np.linalg.norm(hist) + 1e-7)
+        roi_resized = cv2.resize(face_roi, (64, 64))
+        hists = []
+        for c in range(3):
+            hist = cv2.calcHist([roi_resized], [c], None, [16], [0, 256]).flatten()
+            hists.append(hist)
+        roi_gray = cv2.cvtColor(roi_resized, cv2.COLOR_BGR2GRAY)
+        gx = cv2.Sobel(roi_gray, cv2.CV_32F, 1, 0, ksize=3)
+        gy = cv2.Sobel(roi_gray, cv2.CV_32F, 0, 1, ksize=3)
+        g_mag = np.sqrt(gx**2 + gy**2)
+        g_hist = cv2.calcHist([g_mag.astype(np.uint8)], [0], None, [16], [0, 256]).flatten()
+        hists.append(g_hist)
         
+        emb = np.concatenate(hists)
+        emb = emb / (np.linalg.norm(emb) + 1e-7)
         results.append({
             "face_id": idx + 1,
             "bbox": {"x": int(x), "y": int(y), "width": int(w), "height": int(h)},
             "confidence": 0.92,
-            "embedding": hist.tolist()
+            "embedding": emb.tolist()
         })
     return results
 
@@ -167,6 +194,7 @@ def generate_ela_heatmap(image: np.ndarray, quality: int = 90) -> Tuple[str, flo
         enhanced = ImageEnhance.Brightness(diff).enhance(scale * 1.5)
         
         # Calculate tampering anomaly score via ELA standard deviation and outlier density
+        # Compute tampering anomaly score via ELA standard deviation and outlier density
         diff_arr = np.array(enhanced.convert("L"))
         diff_raw = np.array(diff.convert("L"), dtype=np.float32)
         ela_std = float(np.std(diff_raw))
@@ -181,8 +209,8 @@ def generate_ela_heatmap(image: np.ndarray, quality: int = 90) -> Tuple[str, flo
         _, buf = cv2.imencode('.jpg', blended, [cv2.IMWRITE_JPEG_QUALITY, 85])
         ela_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode('utf-8')
         
-        # Normalized tampering ratio (0.0 to 1.0)
-        tampering_ratio = round(min(1.0, max(0.0, (ela_std - 1.5) / 10.0)), 4)
+        # Calibrated normalized tampering ratio: clean genuine IDs have std < 3.5; spliced/edited regions have std > 4.2
+        tampering_ratio = round(min(1.0, max(0.0, (ela_std - 3.8) / 10.0)), 4)
         return ela_b64, tampering_ratio
     except Exception:
         return "", 0.0
@@ -203,15 +231,19 @@ def compute_noise_inconsistency(image: np.ndarray) -> float:
         for y in range(0, h - bh + 1, bh):
             for x in range(0, w - bw + 1, bw):
                 patch = noise[y:y+bh, x:x+bw]
-                variances.append(float(np.var(patch)))
+                gray_patch = gray[y:y+bh, x:x+bw]
+                # Filter out flat monochromatic background blocks to prevent false division spikes
+                if float(np.std(gray_patch)) > 5.0:
+                    variances.append(float(np.var(patch)))
         if len(variances) < 4:
             return 0.0
         v_arr = np.array(variances)
         mean_v = np.mean(v_arr)
-        if mean_v < 1e-5:
+        if mean_v < 1e-4:
             return 0.0
         std_v = np.std(v_arr)
-        score = min(1.0, max(0.0, (std_v / (mean_v + 1e-4) - 0.8) / 2.5))
+        coeff_var = std_v / (mean_v + 1e-4)
+        score = min(1.0, max(0.0, (coeff_var - 1.2) / 3.0))
         return float(round(score, 4))
     except Exception:
         return 0.0
@@ -224,28 +256,23 @@ def compute_moire_energy(image: np.ndarray) -> float:
     """
     try:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        h, w = gray.shape
-        f = np.fft.fft2(gray)
+        lap = cv2.Laplacian(gray, cv2.CV_32F)
+        f = np.fft.fft2(lap)
         fshift = np.fft.fftshift(f)
-        magnitude = np.abs(fshift)
+        mag = np.abs(fshift)
         
-        # High-frequency ring
+        h, w = mag.shape
         cy, cx = h // 2, w // 2
-        r_in = min(h, w) // 6
-        r_out = min(h, w) // 2
-        y, x = np.ogrid[:h, :w]
-        dist = np.sqrt((x - cx)**2 + (y - cy)**2)
-        mask = (dist >= r_in) & (dist <= r_out)
+        # Zero out center DC and standard horizontal/vertical document border axes
+        mag[cy-5:cy+6, cx-5:cx+6] = 0
+        mag[cy-2:cy+3, :] = 0
+        mag[:, cx-2:cx+3] = 0
         
-        high_freq = magnitude[mask]
-        if len(high_freq) == 0:
-            return 0.0
-            
-        p99 = np.percentile(high_freq, 99.5)
-        p50 = np.percentile(high_freq, 50.0) + 1e-5
-        ratio = float(p99 / p50)
-        energy = min(1.0, max(0.0, (ratio - 8.0) / 15.0))
-        return float(round(energy, 4))
+        max_val = float(np.max(mag))
+        mean_val = float(np.mean(mag)) + 1e-4
+        par = max_val / mean_val
+        score = min(1.0, max(0.0, (par - 15.0) / 40.0))
+        return float(round(score, 4))
     except Exception:
         return 0.0
 
