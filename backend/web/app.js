@@ -188,10 +188,13 @@ const elements = {
 const THEMES = {
   "cyberpunk": { name: "Cyberpunk", icon: "⚡" },
   "matrix": { name: "Matrix", icon: "💻" },
-  "federal-navy": { name: "Federal Intel", icon: "🛡️" },
-  "crimson-threat": { name: "Crimson Threat", icon: "🚨" },
-  "aurora-violet": { name: "Aurora Violet", icon: "🌌" },
-  "arctic-light": { name: "Arctic Forensic", icon: "☀️" },
+  "federal-navy": { name: "Midnight Blue", icon: "🛡️" },
+  "crimson-threat": { name: "Crimson Red", icon: "🚨" },
+  "aurora-violet": { name: "Aurora Purple", icon: "🌌" },
+  "arctic-light": { name: "Arctic Ice Light", icon: "☀️" },
+  "sunlight-amber": { name: "Solar Amber Light", icon: "🌅" },
+  "mint-emerald": { name: "Mint Emerald Light", icon: "🌿" },
+  "nordic-lavender": { name: "Nordic Violet Light", icon: "🌸" },
 };
 
 // ============================================================================
@@ -230,7 +233,7 @@ function setTheme(themeKey) {
   if (elements.currentThemeName) elements.currentThemeName.textContent = meta.name;
 
   // Update active state on option buttons
-  elements.themeOptBtns?.forEach(btn => {
+  document.querySelectorAll(".theme-opt-btn").forEach(btn => {
     if (btn.getAttribute("data-theme") === themeKey) {
       btn.classList.add("active");
     } else {
@@ -253,7 +256,7 @@ function setupEventListeners() {
     }
   });
 
-  elements.themeOptBtns?.forEach(btn => {
+  document.querySelectorAll(".theme-opt-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const selected = btn.getAttribute("data-theme");
