@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Imposter Check | Easy Real vs Fake Identity Detector</title>
+  <link rel="icon" type="image/jpeg" href="/logo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Ambient background glow particles -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Floating Toast Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <!-- Brand Logo Menu Toggle Button & Dropdown -->
+      <div class="brand-dropdown-wrapper" id="brand-dropdown-wrapper">
+        <button type="button" class="brand brand-menu-btn" id="brand-logo" aria-label="Open Navigation & Tools Menu" aria-expanded="false" title="Click for Navigation & Tools">
+          <div class="brand-icon">
+            <img src="/logo.jpeg" alt="The Imposter Check Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">THE IMPOSTER CHECK</span>
+            <span class="brand-tag">EASY FAKE ID & DEEPFAKE DETECTOR</span>
+          </div>
+          <div class="brand-chevron-badge">
+            <span class="brand-menu-label">TABS</span>
+            <svg class="chevron-icon brand-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Brand Dropdown Tabs Menu -->
+        <div class="brand-dropdown-menu hidden" id="brand-dropdown-menu">
+          <div class="brand-dropdown-header">
+            <div class="brand-header-badge">
+              <span class="badge-dot"></span>
+              <span>FORENSIC TOOLS & TABS</span>
+            </div>
+            <span class="brand-header-subtitle">Switch scanner mode, view logs, or customize profile</span>
+          </div>
+
+          <div class="brand-tabs-list">
+            <div class="brand-tabs-group-label">Inspection Studios</div>
+
+            <!-- Tab 1: Single File Scan -->
+            <button type="button" class="brand-tab-item active" data-tab="upload">
+              <span class="brand-tab-icon">🪪</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Scan Studio (Upload)</span>
+                <span class="brand-tab-desc">Single ID card photo, video, PDF, or audio file</span>
+              </div>
+              <span class="brand-tab-tag">Studio</span>
+            </button>
+
+            <!-- Tab 2: Multi-File Compare -->
+            <button type="button" class="brand-tab-item" data-tab="compare">
+              <span class="brand-tab-icon">⚖️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Multi-File Compare</span>
+                <span class="brand-tab-desc">Cross-identity match & discrepancy matrix</span>
+              </div>
+              <span class="brand-tab-tag">Compare</span>
+            </button>
+
+            <!-- Tab 3: Live Camera -->
+            <button type="button" class="brand-tab-item" data-tab="camera">
+              <span class="brand-tab-icon">🎥</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Live WebRTC Camera</span>
+                <span class="brand-tab-desc">Real-time webcam snapshot & liveness motion test</span>
+              </div>
+              <span class="brand-tab-tag">Live</span>
+            </button>
+
+            <!-- Tab 4: Audio Forensics -->
+            <button type="button" class="brand-tab-item" data-tab="audio">
+              <span class="brand-tab-icon">🎙️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Voice & Audio Deepfake</span>
+                <span class="brand-tab-desc">Live microphone capture & spectral frequency analyzer</span>
+              </div>
+              <span class="brand-tab-tag">Voice</span>
+            </button>
+
+            <!-- Tab 5: URL Checker -->
+            <button type="button" class="brand-tab-item" data-tab="url">
+              <span class="brand-tab-icon">🔗</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Remote Web URL Scanner</span>
+                <span class="brand-tab-desc">Download & inspect remote links and online media</span>
+              </div>
+              <span class="brand-tab-tag">Web</span>
+            </button>
+
+            <div class="brand-tabs-group-label">Forensic Resources & History</div>
+
+            <!-- Tab 6: Preloaded Samples -->
+            <button type="button" class="brand-tab-item" data-tab="samples">
+              <span class="brand-tab-icon">🧪</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Pre-Loaded Test Samples</span>
+                <span class="brand-tab-desc">12 genuine vs imposter test cases library</span>
+              </div>
+              <span class="brand-tab-tag highlight">Samples</span>
+            </button>
+
+            <!-- Tab 7: History Logs -->
+            <button type="button" class="brand-tab-item" data-tab="history">
+              <span class="brand-tab-icon">📜</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Audit History & Logs</span>
+                <span class="brand-tab-desc">Review previous scan verdicts & forensic scores</span>
+              </div>
+              <span class="brand-tab-tag">Audit</span>
+            </button>
+
+            <div class="brand-tabs-group-label">Account & Configuration</div>
+
+            <!-- Tab 8: Profile Settings (Requested!) -->
+            <button type="button" class="brand-tab-item brand-tab-settings" data-tab="profile-settings" id="btn-brand-open-profile">
+              <span class="brand-tab-icon">⚙️</span>
+              <div class="brand-tab-info">
+                <span class="brand-tab-title">Profile Settings</span>
+                <span class="brand-tab-desc">Edit profile picture, name, role, badge & preferences</span>
+              </div>
+              <span class="brand-tab-tag pulse">Settings</span>
+            </button>
+          </div>
+
+          <div class="brand-dropdown-footer">
+            <div class="brand-footer-user" id="brand-menu-user-info">
+              <img id="brand-menu-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Avatar" class="mini-avatar">
+              <div class="brand-footer-text">
+                <span id="brand-menu-user-name" class="brand-user-name">Forensic User</span>
+                <span id="brand-menu-user-role" class="brand-user-role">ID Checker</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline btn-xs" id="brand-menu-btn-profile" title="Open Profile">
+              <span>Edit Profile</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="system-status">
+          <span class="status-pulse"></span>
+          <span class="status-text">AI Scanner Online & Ready</span>
+        </div>
+
+        <!-- Theme Selector Menu -->
+        <div class="theme-dropdown-wrapper" id="theme-dropdown-wrapper">
+          <button type="button" class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Select Theme" title="Change Theme Color">
+            <span class="theme-icon" id="current-theme-icon">🎨</span>
+            <span class="theme-name" id="current-theme-name">Cyberpunk</span>
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="theme-menu hidden" id="theme-menu">
+            <div class="theme-menu-header">Dark Themes</div>
+            <div class="theme-options-grid">
+              <button type="button" class="theme-opt-btn active" data-theme="cyberpunk">
+                <span class="theme-swatch swatch-cyberpunk"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">⚡ Cyberpunk Neon</span>
+                  <span class="theme-opt-desc">Dark Obsidian & Bright Blue</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="matrix">
+                <span class="theme-swatch swatch-matrix"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">💻 Matrix Terminal</span>
+                  <span class="theme-opt-desc">Classic Terminal Green</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="federal-navy">
+                <span class="theme-swatch swatch-navy"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🛡️ Midnight Blue</span>
+                  <span class="theme-opt-desc">Deep Navy & Sky Blue</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="crimson-threat">
+                <span class="theme-swatch swatch-crimson"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🚨 Crimson Red</span>
+                  <span class="theme-opt-desc">Dark Slate & Vibrant Red</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="aurora-violet">
+                <span class="theme-swatch swatch-violet"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🌌 Aurora Purple</span>
+                  <span class="theme-opt-desc">Amethyst & Electric Violet</span>
+                </div>
+              </button>
+            </div>
+
+            <div class="theme-menu-header theme-menu-header-secondary">☀️ Light Themes (High Contrast)</div>
+            <div class="theme-options-grid">
+              <button type="button" class="theme-opt-btn" data-theme="arctic-light">
+                <span class="theme-swatch swatch-arctic"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">☀️ Arctic Ice Light</span>
+                  <span class="theme-opt-desc">Crisp White & Cerulean Blue</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="sunlight-amber">
+                <span class="theme-swatch swatch-amber"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🌅 Solar Amber Light</span>
+                  <span class="theme-opt-desc">Warm Sand & Golden Amber</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="mint-emerald">
+                <span class="theme-swatch swatch-mint"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🌿 Mint Emerald Light</span>
+                  <span class="theme-opt-desc">Sage White & Forest Emerald</span>
+                </div>
+              </button>
+              <button type="button" class="theme-opt-btn" data-theme="nordic-lavender">
+                <span class="theme-swatch swatch-lavender"></span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-title">🌸 Nordic Violet Light</span>
+                  <span class="theme-opt-desc">Lilac Mist & Royal Iris</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Logged Out state -->
+        <div id="nav-auth-buttons" class="nav-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="btn-show-login">Sign In</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-show-signup">Create Free Account</button>
+        </div>
+
+        <!-- Logged In profile badge -->
+        <div id="nav-user-profile" class="user-profile-badge hidden" title="Account & Settings">
+          <div class="user-badge-clickable" id="btn-header-profile-modal" title="Click to edit Profile & Picture">
+            <img id="nav-user-avatar" src="" alt="Avatar" class="user-avatar">
+            <div class="user-info-text">
+              <span id="nav-user-name" class="user-name">User</span>
+              <span id="nav-user-role" class="user-role">ID Checker</span>
+            </div>
+          </div>
+          <button type="button" class="btn-icon" id="btn-nav-settings" title="Profile Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <button type="button" class="btn-icon" id="btn-logout" title="Sign Out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- ==============================================
+         SCREEN 1: SIMPLE AUTHENTICATION (LOGIN / SIGN UP)
+         ============================================== -->
+    <section id="screen-auth" class="screen-view active">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <!-- Auth Header -->
+          <div class="auth-header">
+            <div class="auth-brand-emblem">
+              <img src="/logo.jpeg" alt="The Imposter Check Emblem" class="auth-brand-logo-img">
+            </div>
+            <div class="auth-badge">
+              <span>🔒 SECURE IDENTITY ACCESS</span>
+            </div>
+            <h1 class="auth-title">The Imposter Check</h1>
+            <p class="auth-subtitle">Real vs Fake Identity Verification & Deepfake Forensics Platform.</p>
+          </div>
+
+          <!-- Fast 1-Click Demo Access Button -->
+          <button type="button" class="btn btn-primary btn-block btn-lg demo-banner-btn" id="btn-quick-demo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span>⚡ Instant One-Click Login (Try App Immediately)</span>
+          </button>
+
+          <div class="auth-divider">
+            <span>or sign in with social account</span>
+          </div>
+
+          <!-- Social Login Provider Buttons -->
+          <div class="social-login-grid">
+            <button type="button" class="btn-social" data-provider="google">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8 0-1.3.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="github">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="apple">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.56.65-1.06 1.7-0.93 2.73 1 .08 2.02-.48 2.64-1.23z"/>
+              </svg>
+              <span>Apple</span>
+            </button>
+
+            <button type="button" class="btn-social" data-provider="microsoft">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#F25022" d="M1 1h10v10H1z"/>
+                <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+                <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+                <path fill="#FFB900" d="M13 13h10v10H13z"/>
+              </svg>
+              <span>Microsoft</span>
+            </button>
+          </div>
+
+          <!-- Auth Tabs -->
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" id="tab-login-btn">Sign In with Email</button>
+            <button type="button" class="auth-tab-btn" id="tab-signup-btn">Create New Account</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form id="form-login" class="auth-form">
+            <div class="form-group">
+              <label for="login-email">Email Address</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="login-email" type="email" placeholder="mahita.thundiyil.btech2024@sitpune.edu.in" required value="mahita.thundiyil.btech2024@sitpune.edu.in">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="login-password" type="password" placeholder="••••••••••••" required value="password123">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-secondary btn-block btn-lg" id="btn-submit-login">
+              <span>Sign In</span>
+            </button>
+          </form>
+
+          <!-- SIGN UP FORM -->
+          <form id="form-signup" class="auth-form hidden">
+            <div class="form-group">
+              <label for="signup-name">Your Full Name</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input id="signup-name" type="text" placeholder="e.g. Mahita" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-email">Your Email</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="signup-email" type="email" placeholder="mahita.thundiyil.btech2024@sitpune.edu.in" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-role">What will you use this app for?</label>
+              <select id="signup-role" class="form-select">
+                <option value="General User / Personal Use">General User / Checking Personal Documents</option>
+                <option value="Business & Identity Verifier">Business & Customer ID Verification</option>
+                <option value="Security & ID Checker">Security & ID Inspector</option>
+                <option value="Auditor / Fraud Reviewer">Fraud & Document Auditor</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-password">Choose Password</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="signup-password" type="password" placeholder="At least 6 characters" required minlength="6">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-submit-signup">
+              <span>Create Account & Start</span>
+            </button>
+          </form>
+
+          <div id="auth-alert" class="auth-alert hidden"></div>
+        </div>
+      </div>
+
+      <!-- AUTHENTICATED SOCIAL LOGIN POPUP WINDOW (MODAL) -->
+      <div id="modal-social-auth" class="social-modal-overlay hidden">
+        <div class="social-modal-card">
+          <div class="social-modal-header">
+            <div class="social-provider-identity">
+              <div class="social-provider-icon-large" id="social-modal-icon">
+                <!-- Injected via JavaScript -->
+              </div>
+              <div>
+                <h3 class="social-modal-title" id="social-modal-title">Sign in with Google</h3>
+                <p class="social-modal-subtitle">Authenticate to continue to <strong>The Imposter Check</strong></p>
+              </div>
+            </div>
+            <button type="button" class="btn-icon btn-close-modal" id="btn-close-social-modal">✕</button>
+          </div>
+
+          <form id="form-social-auth-popup" class="social-modal-form">
+            <div class="form-group">
+              <label for="social-auth-name">Your Name</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input id="social-auth-name" type="text" placeholder="Mahita" required value="Mahita">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="social-auth-email" id="social-modal-user-label">Username or Email</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="social-auth-email" type="text" placeholder="mahita@impostercheck.ai" required value="mahita@impostercheck.ai">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="social-auth-password">Password</label>
+              <div class="input-with-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="social-auth-password" type="password" placeholder="••••••••••••" required value="password123">
+              </div>
+            </div>
+
+            <div class="social-modal-actions">
+              <button type="button" class="btn btn-outline" id="btn-cancel-social-modal">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-social-popup">
+                <span id="social-submit-btn-label">Authenticate & Sign In</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 2: MAIN SCANNING DASHBOARD
+         ============================================== -->
+    <section id="screen-dashboard" class="screen-view">
+      <div class="dashboard-container">
+        
+        <!-- Friendly Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-left">
+            <h1 class="welcome-heading">Welcome, <span id="dash-user-name" class="highlight-cyan">Mahita</span>! 👋</h1>
+            <p class="welcome-subtext">Check any ID card, photo, video, audio, or document to see if it is <strong>Real or Fake</strong> in seconds.</p>
+
+            <div class="welcome-actions-row">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-open-samples-modal">
+                <span>🧪 Try a Sample Test File (12 Sample Files)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="welcome-right">
+            <!-- 3-Step Simple Guide Box -->
+            <div class="simple-steps-card">
+              <span class="steps-title">💡 How to use:</span>
+              <ul class="steps-list">
+                <li><strong>1. Pick a Tab</strong>: File, Camera, Voice, Link, or Compare.</li>
+                <li><strong>2. Add Your Item</strong>: Drop a file or take a picture.</li>
+                <li><strong>3. Click Check</strong>: Get a clear Real vs Fake answer!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample Files Modal Drawer -->
+        <div id="samples-modal" class="samples-modal-overlay hidden">
+          <div class="samples-modal-card">
+            <div class="samples-modal-header">
+              <div class="samples-modal-title-group">
+                <div class="samples-pill">READY TO TEST</div>
+                <h2>🧪 Click Any Sample File to Test</h2>
+                <p>Pick any example below to see how the app detects genuine vs fake items with 1 click.</p>
+              </div>
+              <button type="button" class="btn-icon btn-close-modal" id="btn-close-samples-modal">✕</button>
+            </div>
+
+            <div class="samples-grid" id="samples-catalog-grid">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Switcher Tabs (Clear & Intuitive) -->
+        <div class="mode-navigation">
+          <button type="button" class="mode-tab active" data-mode="upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>📁 Upload File (Photos, PDFs, Docs)</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="camera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>📸 Live Camera (Photo or Video)</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="audio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            <span>🎙️ Record Voice (AI Voice Check)</span>
+          </button>
+
+          <button type="button" class="mode-tab" data-mode="url">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span>🔗 Check a Web Link</span>
+          </button>
+
+          <button type="button" class="mode-tab mode-tab-compare" data-mode="compare">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"/>
+              <path d="M8 3H3v5"/>
+              <path d="M12 22v-8.3"/>
+            </svg>
+            <span class="compare-badge">⚖️ Compare 2+ Files (Same Person?)</span>
+          </button>
+        </div>
+
+        <!-- STUDIO CONTENT PANELS -->
+        <div class="studio-container">
+
+          <!-- 1. UPLOAD FILE PANEL -->
+          <div id="panel-upload" class="studio-panel active">
+            <form id="form-upload-media" class="panel-card">
+              <div class="drop-zone" id="drop-zone-single">
+                <input type="file" id="file-input-single" class="file-input" accept="image/*,video/*,audio/*,.pdf,.docx,.doc">
+                <div class="drop-content">
+                  <div class="drop-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                      <path d="M12 12v9"/>
+                      <path d="m8 17 4-5 4 5"/>
+                    </svg>
+                  </div>
+                  <h3 class="drop-title">Drop your file here, or click to choose</h3>
+                  <p class="drop-desc">Works with Photos, Videos, Voice Recordings, PDF Documents, and Word DOCX files.</p>
+                  
+                  <div class="supported-tags">
+                    <span class="tag">🖼️ Photos (JPG, PNG, HEIF)</span>
+                    <span class="tag">🎥 Videos (MP4, WebM, Slow-Mo)</span>
+                    <span class="tag">🎙️ Audio (WAV, MP3)</span>
+                    <span class="tag">📄 PDFs & Word Docs</span>
+                    <span class="tag tag-highlight">🪪 Pictures with Multiple ID Cards</span>
+                  </div>
+                </div>
+
+                <!-- Selected File Display -->
+                <div id="selected-file-preview" class="selected-file-box hidden">
+                  <div class="selected-file-info">
+                    <span class="selected-file-icon" id="preview-type-icon">📁</span>
+                    <div>
+                      <h4 id="preview-file-name" class="selected-name">document.pdf</h4>
+                      <p id="preview-file-meta" class="selected-size">1.4 MB</p>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-icon btn-remove" id="btn-remove-selected" title="Remove file">✕</button>
+                </div>
+              </div>
+
+              <div class="form-grid-controls">
+                <div class="form-group flex-1">
+                  <label for="reference-text">Optional: Enter Name or ID Number to verify against</label>
+                  <input type="text" id="reference-text" class="form-input" placeholder="e.g. Mahita or DL-889214">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-screen">
+                  <span>🔍 Check This Document Now</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 2. LIVE CAMERA PANEL -->
+          <div id="panel-camera" class="studio-panel">
+            <div class="panel-card camera-studio">
+              <div class="camera-layout">
+                <div class="camera-viewport-box">
+                  <video id="camera-video-feed" autoplay playsinline muted></video>
+                  <canvas id="camera-canvas" class="hidden"></canvas>
+                  
+                  <div class="camera-overlay-guides">
+                    <div class="card-guide-frame"></div>
+                    <div class="scanner-laser-line"></div>
+                  </div>
+
+                  <div id="recording-indicator" class="recording-badge hidden">
+                    <span class="record-pulse"></span>
+                    <span id="recording-timer">REC 00:05</span>
+                  </div>
+                </div>
+
+                <div class="camera-controls-sidebar">
+                  <h3 class="sidebar-title">Camera Controls</h3>
+                  <p class="sidebar-desc">Hold your card or face inside the frame.</p>
+
+                  <div class="camera-actions-stack">
+                    <button type="button" class="btn btn-secondary btn-block" id="btn-start-camera">
+                      <span>Turn On Camera</span>
+                    </button>
+
+                    <button type="button" class="btn btn-primary btn-block" id="btn-capture-photo" disabled>
+                      <span>📸 Take a Photo</span>
+                    </button>
+
+                    <button type="button" class="btn btn-purple btn-block" id="btn-record-liveness-video" disabled>
+                      <span>🎥 Record 5-Second Video (Check if Person is Real)</span>
+                    </button>
+                  </div>
+
+                  <div id="camera-snapshot-preview" class="snapshot-preview-card hidden">
+                    <span class="preview-label">Captured Photo:</span>
+                    <img id="camera-captured-img" src="" alt="Captured">
+                    <button type="button" class="btn btn-primary btn-block btn-sm" id="btn-screen-captured">Check This Photo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. VOICE RECORDING PANEL -->
+          <div id="panel-audio" class="studio-panel">
+            <div class="panel-card audio-studio">
+              <div class="audio-layout">
+                <div class="audio-visualizer-container">
+                  <canvas id="audio-waveform-canvas" width="600" height="200"></canvas>
+                  <div class="audio-status-overlay">
+                    <span id="audio-studio-status">Press the button below to record voice</span>
+                  </div>
+                </div>
+
+                <div class="audio-controls-box">
+                  <button type="button" class="btn btn-primary btn-lg" id="btn-record-audio">
+                    <span id="record-audio-label">🎙️ Start Recording Voice</span>
+                  </button>
+
+                  <audio id="audio-playback" controls class="hidden"></audio>
+
+                  <button type="button" class="btn btn-secondary hidden" id="btn-screen-audio-sample">
+                    <span>Check If Voice is Real or AI-Generated</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. WEB LINK PANEL -->
+          <div id="panel-url" class="studio-panel">
+            <form id="form-url-screen" class="panel-card">
+              <div class="url-hero">
+                <div class="url-icon">🔗</div>
+                <h3>Check a File from a Web Link</h3>
+                <p>Paste a web link to an online image, document, or PDF.</p>
+              </div>
+
+              <div class="form-group">
+                <label for="input-target-url">Paste Website Link (URL)</label>
+                <input type="url" id="input-target-url" class="form-input" placeholder="https://example.com/sample_id.png" required>
+              </div>
+
+              <div class="form-group">
+                <label for="input-url-reference">Optional: Expected Name or ID</label>
+                <input type="text" id="input-url-reference" class="form-input" placeholder="e.g. Mahita">
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-url">
+                <span>Check Link Now</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- 5. COMPARE MULTIPLE FILES PANEL -->
+          <div id="panel-compare" class="studio-panel">
+            <form id="form-multi-compare" class="panel-card compare-studio">
+              <div class="compare-header">
+                <div class="badge-compare-highlight">MULTI-FILE MATCH CHECK</div>
+                <h2>Compare 2 or More Files for Fake Identity</h2>
+                <p>Upload <strong>2 or more files</strong> (like an ID card + selfie photo + voice clip) to see if they belong to the <strong>same person</strong> or if someone is an <strong>imposter</strong>.</p>
+              </div>
+
+              <div class="multi-drop-zone" id="drop-zone-multi">
+                <input type="file" id="file-input-multi" class="file-input" multiple accept="image/*,video/*,audio/*,.pdf,.docx,.doc">
+                <div class="multi-drop-prompt">
+                  <span>➕ Click here or drag & drop 2 or more files to compare</span>
+                </div>
+              </div>
+
+              <!-- Multi-File Queue -->
+              <div id="multi-file-queue" class="multi-file-grid"></div>
+
+              <div class="form-grid-controls">
+                <div class="form-group flex-1">
+                  <label for="multi-reference-text">Optional: Subject's Name or ID</label>
+                  <input type="text" id="multi-reference-text" class="form-input" placeholder="e.g. Mahita">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-compare" disabled>
+                  <span id="btn-compare-label">Compare Files</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- RECENT SCANS HISTORY TABLE -->
+        <div class="history-section">
+          <div class="history-header">
+            <div class="history-title-group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <h3>📋 Recent Checks History</h3>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-clear-history">Clear History</button>
+          </div>
+
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>File Name</th>
+                  <th>Type</th>
+                  <th>Cards Found</th>
+                  <th>Risk Level</th>
+                  <th>Result</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <tr>
+                  <td colspan="7" class="empty-history-cell">No checks done yet. Upload a file above to begin!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 3: EASY-TO-UNDERSTAND RESULTS PAGE
+         ============================================== -->
+    <section id="screen-results" class="screen-view">
+      <div class="results-container">
+        
+        <!-- Top Back Navigation -->
+        <div class="results-top-nav">
+          <button type="button" class="btn btn-outline" id="btn-back-to-dashboard">
+            <span>← Check Another File</span>
+          </button>
+
+          <div class="results-actions">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-json">
+              <span>💾 Save Data (JSON)</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-print-report">
+              <span>🖨️ Print Report</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CLEAR MAIN VERDICT HERO BANNER -->
+        <div id="verdict-banner" class="verdict-hero verdict-pass">
+          <div class="verdict-main">
+            <div class="verdict-badge" id="verdict-badge-label">REAL & SAFE</div>
+            <h1 class="verdict-title" id="verdict-heading">Document Verified as Real</h1>
+            <p class="verdict-explanation" id="verdict-summary">No tampering or edits found. The identity looks genuine.</p>
+          </div>
+
+          <div class="risk-gauge-box">
+            <div class="gauge-circle">
+              <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path id="gauge-progress" class="circle" stroke-dasharray="10, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="gauge-value">
+                <span id="risk-score-number">10</span><span class="pct">%</span>
+                <span class="gauge-sub">RISK LEVEL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MULTIPLE CARDS FOUND IN 1 FILE (CAROUSEL) -->
+        <div id="multi-card-banner" class="multi-card-strip hidden">
+          <div class="multi-card-header">
+            <div class="multi-card-badge">🪪 MULTIPLE CARDS FOUND IN THIS PICTURE</div>
+            <span id="multi-card-count-label">2 Cards Found (Click any to view)</span>
+          </div>
+          <div id="segmented-cards-carousel" class="cards-carousel-list"></div>
+        </div>
+
+        <!-- MULTI-FILE COMPARE RESULTS (IF COMPARING MULTIPLE FILES) -->
+        <div id="multi-file-compare-results" class="compare-results-matrix hidden">
+          <div class="section-card">
+            <h3 class="section-title">⚖️ Comparison Results (Are they the same person?)</h3>
+            <p class="section-desc">We checked all uploaded files against each other to see if the faces and details match.</p>
+
+            <div class="compare-score-cards">
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Overall Match Score</span>
+                <span id="comp-overall-score" class="comp-stat-val text-cyan">94%</span>
+              </div>
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Face Match</span>
+                <span id="comp-face-score" class="comp-stat-val text-emerald">96%</span>
+              </div>
+              <div class="comp-stat-card">
+                <span class="comp-stat-label">Name & Text Match</span>
+                <span id="comp-text-score" class="comp-stat-val text-purple">92%</span>
+              </div>
+            </div>
+
+            <div id="pairwise-matches-list" class="pairwise-grid"></div>
+          </div>
+        </div>
+
+        <!-- SIMPLE DETAILED CHECKS GRID -->
+        <div class="forensic-grid">
+          
+          <!-- Card 1: Photo & Edit Check -->
+          <div class="section-card">
+            <h3 class="section-title">🖼️ Photo & Editing Check</h3>
+            <p class="section-desc">Highlights if text or photo areas were cut, pasted, or edited digitally.</p>
+            
+            <div class="tamper-viewer">
+              <img id="ela-heatmap-img" src="" alt="Editing Check Image" class="tamper-img">
+              <div id="tamper-status-pill" class="tamper-pill">Original (No Edits)</div>
+            </div>
+
+            <div class="signals-list-box">
+              <h4 class="sub-heading">What we noticed:</h4>
+              <div id="forensic-signals-list" class="signals-tags"></div>
+            </div>
+          </div>
+
+          <!-- Card 2: Text Found in Document -->
+          <div class="section-card">
+            <h3 class="section-title">📝 Text & Details Found</h3>
+            <p class="section-desc">Words, names, and numbers read from the document.</p>
+
+            <div class="ocr-box">
+              <div class="ocr-header-row">
+                <span class="ocr-engine-tag" id="ocr-engine-tag">Scanner: High-Speed AI</span>
+                <span class="ocr-sim-tag" id="ocr-sim-tag">Name Match: 100%</span>
+              </div>
+              <textarea id="ocr-text-display" class="ocr-textarea" readonly placeholder="No text found"></textarea>
+            </div>
+
+            <h4 class="sub-heading">Image Quality Checks:</h4>
+            <div class="quality-metrics-grid">
+              <div class="metric-pill">
+                <span class="metric-lbl">Brightness</span>
+                <span class="metric-val" id="metric-brightness">Good</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Contrast</span>
+                <span class="metric-val" id="metric-contrast">Clear</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Sharpness</span>
+                <span class="metric-val" id="metric-blur">Sharp</span>
+              </div>
+              <div class="metric-pill">
+                <span class="metric-lbl">Glare & Shine</span>
+                <span class="metric-val" id="metric-glare">None</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Video & Audio Check Results (if video or audio was uploaded) -->
+        <div id="media-dynamics-card" class="section-card hidden">
+          <h3 class="section-title" id="media-dynamics-title">🎥 Video & Voice Check</h3>
+          <div id="media-dynamics-content" class="dynamics-grid"></div>
+        </div>
+
+      </div>
+    </section>
+
+  <!-- ==============================================
+       PROFILE & ACCOUNT SETTINGS MODAL
+       ============================================== -->
+  <div id="modal-profile-settings" class="modal-overlay hidden">
+    <div class="profile-settings-card">
+      <!-- Modal Header -->
+      <div class="profile-modal-header">
+        <div class="profile-modal-title-wrap">
+          <div class="profile-modal-icon-badge">⚙️</div>
+          <div>
+            <h2 class="profile-modal-title">Profile & Identity Settings</h2>
+            <p class="profile-modal-subtitle">Customize your forensic analyst credentials, profile picture, and scanner preferences.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-icon btn-close-modal" id="btn-close-profile-modal" title="Close Settings">✕</button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="profile-modal-body">
+        <form id="form-profile-settings" onsubmit="return false;">
+          
+          <!-- SECTION 1: PROFILE PICTURE & AVATAR -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">1</span>
+              <div>
+                <h3 class="section-card-title">Profile Picture & Avatar</h3>
+                <p class="section-card-subtitle">Upload your own photo, take a webcam selfie, or pick an avatar preset.</p>
+              </div>
+            </div>
+
+            <div class="avatar-management-grid">
+              <!-- Avatar Preview Column -->
+              <div class="avatar-preview-box">
+                <div class="avatar-halo-wrapper">
+                  <img id="profile-preview-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Profile Picture" class="profile-large-avatar">
+                  <div class="avatar-status-badge" title="Active Account">🟢</div>
+                </div>
+                <div class="avatar-preview-meta">
+                  <span id="profile-preview-name-label" class="avatar-meta-name">Analyst</span>
+                  <span id="profile-preview-role-label" class="avatar-meta-role">Forensic Specialist</span>
+                </div>
+              </div>
+
+              <!-- Avatar Action Controls Column -->
+              <div class="avatar-action-controls">
+                <!-- Option A: File Upload & Camera -->
+                <div class="avatar-upload-row">
+                  <label for="profile-file-input" class="btn btn-primary btn-sm btn-upload-avatar" title="Choose file from computer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>📁 Upload Picture</span>
+                  </label>
+                  <input type="file" id="profile-file-input" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" class="hidden">
+
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-avatar-webcam-snapshot" title="Snap live avatar photo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                    <span>📸 Snap with Camera</span>
+                  </button>
+
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-avatar-reset" title="Reset to Default Avatar">
+                    <span>↺ Reset</span>
+                  </button>
+                </div>
+
+                <!-- Option B: Presets Selector -->
+                <div class="avatar-presets-wrapper">
+                  <label class="preset-label">Or choose an avatar preset:</label>
+                  <div class="avatar-presets-list">
+                    <button type="button" class="avatar-preset-btn" data-seed="Mahita" title="Lead Analyst Mahita">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Mahita" alt="Mahita">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="CyberDetective" title="Cyber Detective">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=CyberDetective" alt="Detective">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="SecurityGuardian" title="Security Guardian">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SecurityGuardian" alt="Guardian">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="ForensicLead" title="Forensic Scientist">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ForensicLead" alt="Forensic">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="AIAuditor" title="AI Neural Auditor">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=AIAuditor" alt="Auditor">
+                    </button>
+                    <button type="button" class="avatar-preset-btn" data-seed="FederalAgent" title="Federal Agent">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=FederalAgent" alt="Agent">
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Option C: Custom Image URL -->
+                <div class="form-group-inline">
+                  <label for="profile-avatar-url-input">Or enter Avatar Image URL:</label>
+                  <div class="avatar-url-input-group">
+                    <input type="url" id="profile-avatar-url-input" class="form-control form-control-sm" placeholder="https://example.com/my-photo.jpg">
+                    <button type="button" class="btn btn-outline btn-xs" id="btn-apply-avatar-url">Apply URL</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: PERSONAL & PROFESSIONAL IDENTITY -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">2</span>
+              <div>
+                <h3 class="section-card-title">Analyst Identity & Organization</h3>
+                <p class="section-card-subtitle">Information displayed on generated forensic reports and logs.</p>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="profile-input-name">Full Name <span class="required">*</span></label>
+                <input type="text" id="profile-input-name" class="form-control" placeholder="e.g. Mahita Thundiyil" required>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-email">Email Address <span class="verified-tag">✓ Verified</span></label>
+                <input type="email" id="profile-input-email" class="form-control" placeholder="user@domain.com" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-role">Designation / Role</label>
+                <select id="profile-input-role" class="form-control">
+                  <option value="Lead Identity Specialist">Lead Identity Specialist</option>
+                  <option value="Forensic Document Analyst">Forensic Document Analyst</option>
+                  <option value="Cybersecurity Investigator">Cybersecurity Investigator</option>
+                  <option value="Border & Law Enforcement Officer">Border & Law Enforcement Officer</option>
+                  <option value="Anti-Fraud Risk Specialist">Anti-Fraud Risk Specialist</option>
+                  <option value="Compliance & KYC Auditor">Compliance & KYC Auditor</option>
+                  <option value="Security Operations Analyst">Security Operations Analyst</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-org">Agency / Organization</label>
+                <input type="text" id="profile-input-org" class="form-control" placeholder="e.g. National Cyber Forensics Lab">
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-badge">Inspector Badge ID</label>
+                <input type="text" id="profile-input-badge" class="form-control" placeholder="e.g. IMP-2026-9842">
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-bio">Department Bio / Notes</label>
+                <input type="text" id="profile-input-bio" class="form-control" placeholder="e.g. Digital Media Forensics & Biometric Unit">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: SCANNER & SECURITY PREFERENCES -->
+          <div class="profile-section-card">
+            <div class="section-badge-header">
+              <span class="section-badge-num">3</span>
+              <div>
+                <h3 class="section-card-title">Scanner & Security Preferences</h3>
+                <p class="section-card-subtitle">Configure detection sensitivity, notifications, and security protocols.</p>
+              </div>
+            </div>
+
+            <div class="preferences-grid">
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🔬 Deepfake Sensitivity</span>
+                  <span class="pref-desc">Detection confidence strictness for AI face & document edits.</span>
+                </div>
+                <select id="pref-sensitivity" class="form-control form-control-sm pref-select">
+                  <option value="strict">Strict (99% Threshold)</option>
+                  <option value="standard" selected>Standard Balanced (90%)</option>
+                  <option value="fast">Fast Screen (80%)</option>
+                </select>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🔊 Sound Alerts</span>
+                  <span class="pref-desc">Play audio feedback tones upon scan completion.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-sound-effects" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">🛡️ 2-Factor Authentication (2FA)</span>
+                  <span class="pref-desc">Require biometric or security code on login.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-2fa" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="preference-item">
+                <div class="pref-info">
+                  <span class="pref-title">📊 Auto-Save Scan History</span>
+                  <span class="pref-desc">Keep record of all screened documents in audit log.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pref-auto-save-history" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="profile-modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-cancel-profile">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-save-profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>💾 Save Profile Changes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple Loading Screen -->
+  <div id="loading-overlay" class="loading-modal hidden">
+    <div class="loading-box">
+      <div class="scanner-spinner"></div>
+      <h3 class="loading-title">Checking Document...</h3>
+      <p class="loading-text" id="loading-status-text">Scanning for edits, reading text, and checking faces...</p>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

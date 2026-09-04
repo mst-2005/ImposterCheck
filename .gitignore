@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+data/raw/*
+data/processed/*
+models/*.keras
+models/*.joblib
+!.gitkeep
+.DS_Store
+*.DS_Store
+.pytest_cache/
+data/*.json
+.server.pid
+.server.log

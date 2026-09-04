@@ -1,0 +1,7 @@
+tensorflow>=2.16
+scikit-learn>=1.5
+xgboost>=2.1
+joblib>=1.4
+sentence-transformers>=3.0
+paddleocr>=2.8
+paddlepaddle>=3.0
